@@ -22,4 +22,4 @@ The _ARM System Developer's Guide_ (Morgan Kaufmann series) can be bought from [
   #  Implement structures to hold states related to the MMU and MPU.
   #  Implement structures to hold states related to SD memory (cache regions and access regions?)
   #  Abstract away the difference between absolute memory and hardware registers, and allow relocation.
-  #  Implement the different peripherals, starting with the _memory controller(s)_, _interrupt controller(s)_, timer(s) / watchdog times(s) and RS-232.
+  #  Implement the different peripherals, starting with the _memory controller_, _interrupt controller_, _timer_/_watchdog times_ and the _RS-232 port_.
