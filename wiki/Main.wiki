@@ -1,14 +1,15 @@
 #summary gp2xemu main page
 
 = Introduction =
-Gp2xemu is an emulator    which emulates the [http://www.gp2x.co.uk gp2x] handheld device.
 ----
+Gp2xemu is an emulator which emulates the [http://www.gp2x.co.uk gp2x] handheld device.
 The goal is to be able to boot a working bootloader and OS. By emulating an RS-232 port via the EXT port, one can get visual feedback without audio and graphics. Audio and graphics will be added at the end of the development cycle, if *at all*. This emulator isn't made with gaming in mind, but to aid developers in debugging firmware.
 
 == Documentation ==
-   Helpful documentation can be found [http://www.mechcore.net/files/docs/ here]
-   GNU ARM as reference for macros, directives and psuedo-instructions can be found [http://www.mechcore.net/files/docs/GasARMRef.pdf here]
-   A nice ARM opcode reference made by Re-Eject can be found [http://www.mechcore.net/files/docs/armref.pdf here]
-   A nice ARM Thumb opcode reference made by Re-Eject can be found [http://www.mechcore.net/files/docs/ThumbRefV2-beta.pdf here]
-   The specifications for the MMSP2 System-On-A-Chip can be found [http://www.mechcore.net/files/docs/MP2520F_Manual_Eng_V1.0.pdf here]
-   The GP2X uses some extra peripherals which is not a part of the MMSP2. I'll add them later when the time comes.
+  *Helpful documentation can be found [http://www.mechcore.net/files/docs/ here]
+  *GNU ARM as reference for macros, directives and psuedo-instructions can be found [http://www.mechcore.net/files/docs/GasARMRef.pdf here]
+  *A nice ARM opcode reference made by Re-Eject can be found [http://www.mechcore.net/files/docs/armref.pdf here]
+  *A nice ARM Thumb opcode reference made by Re-Eject can be found [http://www.mechcore.net/files/docs/ThumbRefV2-beta.pdf here]
+  *The specifications for the MMSP2 System-On-A-Chip can be found [http://www.mechcore.net/files/docs/MP2520F_Manual_Eng_V1.0.pdf here]
+
+The GP2X uses some extra peripherals which is not a part of the MMSP2. I'll add them later when the time comes.
