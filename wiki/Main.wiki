@@ -19,7 +19,8 @@ The _ARM System Developer's Guide_ (Morgan Kaufmann series) can be bought from [
 == TODO ==
   #  Implement the full ARMv4 instruction set and the _M_ extension (xMLAL, xMULL). This also includes defining structures for the PSRs, the 16 general-purpose registers and the banked registers.
   #  Come up with a code design for reading the NAND image located under /trunk/gp2x-emu/nand, fetch the instructions and dispatching them.
-  #  Implement structures to hold states related to the MMU and MPU.
+  #  Implement structures to hold states related to the MMU and MPU ( cp15).
   #  Implement structures to hold states related to SD memory (cache regions and access regions?)
   #  Abstract away the difference between absolute memory and hardware registers, and allow relocation.
   #  Implement the different peripherals, starting with the _memory controller_, _interrupt controller_, _timer_/_watchdog timer_ and the _RS-232 port_.
+  #  Implement emulation of EmbeddedIce and JTAG?
