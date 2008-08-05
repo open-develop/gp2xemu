@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1217911048 source:c:\repos\gp2x-emu\trunk\gp2x-emu\src\tests\opcodelist\opcode_mask_unittest\opcodelist.c
+	<stdlib.h>
+	<stdio.h>
+	"../../../opcodelist.h"
+	"../../../opcodes.h"
+
+1217913206 c:\repos\gp2x-emu\trunk\gp2x-emu\src\opcodelist.h
+
+1217908608 c:\repos\gp2x-emu\trunk\gp2x-emu\src\opcodes.h
+	"opcodelist.h"
+

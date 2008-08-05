@@ -1,7 +1,7 @@
 #ifndef OPCODELIST_H_
 #define OPCODELIST_H_
 
-/*! TODO: 
+/*! TODO:
  *     We should be able to differ between UNPREDICTABLE and UNDEFINED
  *     instruction space. I bet the C library soft-float emulation
  *     depends on the "undefined" exception.
@@ -32,7 +32,7 @@
 #define ADD1_SBZ		0x0F600010
 #define ADD2_SBO		0x00800010
 #define ADD2_SBZ		0x0F600080
-                      
+
 #define AND0_SBO		0x02000000
 #define AND0_SBZ		0x0DE00000
 #define AND1_SBO		0x00000000
@@ -72,7 +72,7 @@
 #define CMP1_SBZ		0x0EA0F010
 #define CMP2_SBO		0x01500010
 #define CMP2_SBZ		0x0EA0F080
-                      
+
 #define EOR0_SBO		0x02200000
 #define EOR0_SBZ		0x0DC00000
 #define EOR1_SBO		0x00200000
@@ -156,12 +156,12 @@
 #define MVN2_SBZ		0x0E0F0080
 
 #define ORR0_SBO		0x03800000
-#define ORR0_SBZ		0x0C6F0000
+#define ORR0_SBZ		0x0C600000
 #define ORR1_SBO		0x01800000
-#define ORR1_SBZ		0x0E6F0010
+#define ORR1_SBZ		0x0E600010
 #define ORR2_SBO		0x01800010
-#define ORR2_SBZ		0x0E6F0080
-                      
+#define ORR2_SBZ		0x0E600080
+
 #define RSB0_SBO		0x02600000
 #define RSB0_SBZ		0x0D800000
 #define RSB1_SBO		0x00600000
@@ -186,8 +186,8 @@
 #define SMLAL0_SBO		0x00E00090
 #define SMLAL0_SBZ		0x0F000060
 
-#define SMULL_SBO		0x00C00090
-#define SMULL_SBZ		0x0F200060
+#define SMULL0_SBO		0x00C00090
+#define SMULL0_SBZ		0x0F200060
 
 #define STC0_SBO		0x0C000000
 #define STC0_SBZ		0x02100000
