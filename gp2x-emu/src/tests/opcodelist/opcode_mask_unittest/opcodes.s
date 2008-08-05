@@ -1,4 +1,5 @@
-@@ Arithmetic instructions with barrel shifter are first listed
+@@ Arithmetic, logical and comparsion instructions with 
+@@ barrel shifter (Adress Mode 1 according to ARM ARM) are first listed
 @@
 ADC r0, r1, #255
 ADC r0, r1, r2
