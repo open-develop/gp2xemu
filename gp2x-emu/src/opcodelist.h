@@ -2,19 +2,23 @@
 #define OPCODELIST_H_
 
 /*! TODO: 
- * 1.) Finish this awful monotonous task of creating this table of
- *      should-be-one and should-be-zero masks for the opcodes
- * 2.) Seperate the SBO and SBZ fields from the opcode fields.
  *     We should be able to differ between UNPREDICTABLE and UNDEFINED
- *      instruction space. I bet the C library soft-float emulation
- *      depends on the "undefined" exception.
+ *     instruction space. I bet the C library soft-float emulation
+ *     depends on the "undefined" exception.
 */
 
+#define INSTR_UNDEFINED0_SBO 0x000000D0
+#define INSTR_UNDEFINED0_SBZ 0x0E100020
+#define INSTR_UNDEFINED1_SBO 0x000000F0
+#define INSTR_UNDEFINED1_SBZ 0x0E100000
+#define INSTR_UNDEFINED2_SBO 0x06000010
+#define INSTR_UNDEFINED2_SBZ 0x08000000
 
-/*!
-   0 1 2 3 4 5 6 7 8 9 A B C D E F
-   F E D C B A 9 8 7 6 5 4 3 2 1 0
-*/ 
+#define INSTR_UNPREDICTABLE0_SBO 0x08600000
+#define INSTR_UNPREDICTABLE0_SBZ 0x06100000
+#define INSTR_UNPREDICTABLE1_SBO 0x08700000
+#define INSTR_UNPREDICTABLE1_SBZ 0x06000000
+
 #define ADC0_SBO		0x02A00000
 #define ADC0_SBZ		0x0D400000
 #define ADC1_SBO		0x00A00000
@@ -75,7 +79,7 @@
 #define EOR1_SBZ		0x0FC00010
 #define EOR2_SBO		0x00200010
 #define EOR2_SBZ		0x0FC00080
-/* fortsett paa ldc */
+
 #define LDC0_SBO		0x0C100000
 #define LDC0_SBZ		0x02000000
 
@@ -195,57 +199,57 @@
 #define STM2_SBO		0x08408000
 #define STM2_SBZ		0x06100000
 
-#define STR0_SBO		0x00000000
-#define STR0_SBZ		0x00000000
-#define STR1_SBO		0x00000000
-#define STR1_SBZ		0x00000000
-#define STR2_SBO		0x00000000
-#define STR2_SBZ		0x00000000
-#define STR3_SBO		0x00000000
-#define STR3_SBZ		0x00000000
-#define STR4_SBO		0x00000000
-#define STR4_SBZ		0x00000000
-#define STR5_SBO		0x00000000
-#define STR5_SBZ		0x00000000
-#define STR6_SBO		0x00000000
-#define STR6_SBZ		0x00000000
-#define STR7_SBO		0x00000000
-#define STR7_SBZ		0x00000000
-#define STR8_SBO		0x00000000
-#define STR8_SBZ		0x00000000
+#define STR0_SBO		0x04000000
+#define STR0_SBZ		0x0A500000
+#define STR1_SBO		0x06000000
+#define STR1_SBZ		0x08500010
+#define STR2_SBO		0x04400000
+#define STR2_SBZ		0x0A100000
+#define STR3_SBO		0x06400000
+#define STR3_SBZ		0x08100010
+#define STR4_SBO		0x04600000
+#define STR4_SBZ		0x0B100000
+#define STR5_SBO		0x06600000
+#define STR5_SBZ		0x09100010
+#define STR6_SBO		0x000000B0
+#define STR6_SBZ		0x0E100040
+#define STR7_SBO		0x04200000
+#define STR7_SBZ		0x0B500000
+#define STR8_SBO		0x06200000
+#define STR8_SBZ		0x09500010
 
-#define SUB0_SBO		0x00000000
-#define SUB0_SBZ		0x00000000
-#define SUB1_SBO		0x00000000
-#define SUB1_SBZ		0x00000000
-#define SUB2_SBO		0x00000000
-#define SUB2_SBZ		0x00000000
+#define SUB0_SBO		0x02400000
+#define SUB0_SBZ		0x0DA00000
+#define SUB1_SBO		0x00400000
+#define SUB1_SBZ		0x0FA00010
+#define SUB2_SBO		0x00400010
+#define SUB2_SBZ		0x0FA00080
 
-#define SWI0_SBO		0x00000000
+#define SWI0_SBO		0x0F000000
 #define SWI0_SBZ		0x00000000
 
-#define SWP0_SBO		0x00000000
-#define SWP0_SBZ		0x00000000
-#define SWP1_SBO		0x00000000
-#define SWP1_SBZ		0x00000000
+#define SWP0_SBO		0x01000090
+#define SWP0_SBZ		0x0EF00F60
+#define SWP1_SBO		0x01400090
+#define SWP1_SBZ		0x0EB00F60
 
-#define TEQ0_SBO		0x00000000
-#define TEQ0_SBZ		0x00000000
-#define TEQ1_SBO		0x00000000
-#define TEQ1_SBZ		0x00000000
-#define TEQ2_SBO		0x00000000
-#define TEQ2_SBZ		0x00000000
+#define TEQ0_SBO		0x03300000
+#define TEQ0_SBZ		0x0CC0F000
+#define TEQ1_SBO		0x01300000
+#define TEQ1_SBZ		0x0EC0F010
+#define TEQ2_SBO		0x01300010
+#define TEQ2_SBZ		0x0EC0F080
 
-#define TST0_SBO		0x00000000
-#define TST0_SBZ		0x00000000
-#define TST1_SBO		0x00000000
-#define TST1_SBZ		0x00000000
-#define TST2_SBO		0x00000000
-#define TST2_SBZ		0x00000000
+#define TST0_SBO		0x03100000
+#define TST0_SBZ		0x0CE0F000
+#define TST1_SBO		0x01100000
+#define TST1_SBZ		0x0EE0F010
+#define TST2_SBO		0x01100010
+#define TST2_SBZ		0x0EE0F080
 
-#define UMLAL0_SBO		0x00000000
-#define UMLAL0_SBZ		0x00000000
+#define UMLAL0_SBO		0x00A00090
+#define UMLAL0_SBZ		0x0F300060
 
-#define UMULL0_SBO		0x00000000
-#define UMULL0_SBZ		0x00000000
+#define UMULL0_SBO		0x00800090
+#define UMULL0_SBZ		0x0F600060
 #endif
