@@ -194,3 +194,17 @@ TST r0, r1, LSR r3
 TST r0, r1, ASR r3
 TST r0, r1, ROR r3
 
+@@ Branches
+B  0x00123456
+BL 0x00123456
+BX 0x00345678
+
+@@ PSR instructions
+MRS r0, cpsr
+MRS r0, spsr
+MSR cpsr_c, #1020
+MSR cpsr_cxsf, r0
+MSR spsr_c, #1020
+MSR spsr_cxsf, r0
+
+@@ Multiplication instructions
