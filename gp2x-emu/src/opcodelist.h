@@ -1,8 +1,14 @@
 #ifndef OPCODELIST_H_
 #define OPCODELIST_H_
 
-/*! TODO: Finish this awful monotonous task of creating this table of
- * should-be-one and should-be-zero masks for the opcodes */
+/*! TODO: 
+ * 1.) Finish this awful monotonous task of creating this table of
+ *      should-be-one and should-be-zero masks for the opcodes
+ * 2.) Seperate the SBO and SBZ fields from the opcode fields.
+ *     We should be able to differ between UNPREDICTABLE and UNDEFINED
+ *      instruction space. I bet the C library soft-float emulation
+ *      depends on the "undefined" exception.
+*/
 
 
 /*!
@@ -70,122 +76,124 @@
 #define EOR2_SBO		0x00200010
 #define EOR2_SBZ		0x0FC00080
 /* fortsett paa ldc */
-#define LDC0_SBO		0x00000000
-#define LDC0_SBZ		0x00000000
+#define LDC0_SBO		0x0C100000
+#define LDC0_SBZ		0x02000000
 
-#define LDM0_SBO		0x00000000
-#define LDM0_SBZ		0x00000000
-#define LDM1_SBO		0x00000000
-#define LDM1_SBZ		0x00000000
-#define LDM2_SBO		0x00000000
-#define LDM2_SBZ		0x00000000
+#define LDM0_SBO		0x08500000
+#define LDM0_SBZ		0x06208000
+#define LDM1_SBO		0x08100000
+#define LDM1_SBZ		0x06400000
+#define LDM2_SBO		0x08508000
+#define LDM2_SBZ		0x06000000
 
-#define LDR0_SBO		0x00000000
-#define LDR0_SBZ		0x00000000
-#define LDR1_SBO		0x00000000
-#define LDR1_SBZ		0x00000000
-#define LDR2_SBO		0x00000000
-#define LDR2_SBZ		0x00000000
-#define LDR3_SBO		0x00000000
-#define LDR3_SBZ		0x00000000
-#define LDR4_SBO		0x00000000
-#define LDR4_SBZ		0x00000000
-#define LDR5_SBO		0x00000000
-#define LDR5_SBZ		0x00000000
-#define LDR6_SBO		0x00000000
-#define LDR6_SBZ		0x00000000
-#define LDR7_SBO		0x00000000
-#define LDR7_SBZ		0x00000000
-#define LDR8_SBO		0x00000000
-#define LDR8_SBZ		0x00000000
-#define LDR9_SBO		0x00000000
-#define LDR9_SBZ		0x00000000
-#define LDR10_SBO		0x00000000
-#define LDR10_SBZ		0x00000000
+#define LDR0_SBO		0x04100000
+#define LDR0_SBZ		0x0A400000
+#define LDR1_SBO		0x06100000
+#define LDR1_SBZ		0x08400010
+#define LDR2_SBO		0x04500000
+#define LDR2_SBZ		0x0A000000
+#define LDR3_SBO		0x06500000
+#define LDR3_SBZ		0x08000010
+#define LDR4_SBO		0x04700000
+#define LDR4_SBZ		0x0B000000
+#define LDR5_SBO		0x06700000
+#define LDR5_SBZ		0x09000010
+#define LDR6_SBO		0x001000B0
+#define LDR6_SBZ		0x0E000040
+#define LDR7_SBO		0x001000D0
+#define LDR7_SBZ		0x0E000020
+#define LDR8_SBO		0x001000F0 /* addr mode */
+#define LDR8_SBZ		0x0E000000 /* addr mode */
+#define LDR9_SBO		0x04300000 /* addr mode */
+#define LDR9_SBZ		0x0B400000
+#define LDR10_SBO		0x06300000
+#define LDR10_SBZ		0x09400010
 
-#define MCR0_SBO		0x00000000
-#define MCR0_SBZ		0x00000000
+#define MCR0_SBO		0x0E000010
+#define MCR0_SBZ		0x01100000
 
-#define MLA0_SBO		0x00000000
-#define MLA0_SBZ		0x00000000
+#define MLA0_SBO		0x00200090
+#define MLA0_SBZ		0x0FC00060
 
-#define MOV0_SBO		0x00000000
-#define MOV0_SBZ		0x00000000
-#define MOV1_SBO		0x00000000
-#define MOV1_SBZ		0x00000000
-#define MOV2_SBO		0x00000000
-#define MOV2_SBZ		0x00000000
+#define MOV0_SBO		0x03A00000
+#define MOV0_SBZ		0x0C4F0000
+#define MOV1_SBO		0x01A00000
+#define MOV1_SBZ		0x0E4F0010
+#define MOV2_SBO		0x01A00010
+#define MOV2_SBZ		0x0E4F0080
 
-#define MRC0_SBO		0x00000000
-#define MRC0_SBZ		0x00000000
+#define MRC0_SBO		0x0E100010
+#define MRC0_SBZ		0x01000000
 
-#define MRS0_SBO		0x00000000
-#define MRS0_SBZ		0x00000000
-#define MRS1_SBO		0x00000000
-#define MRS1_SBZ		0x00000000
+#define MRS0_SBO		0x010F0000
+#define MRS0_SBZ		0x0EF00FFF
+#define MRS1_SBO		0x014F0000
+#define MRS1_SBZ		0x0EB00FFF
 
-#define MSR0_SBO		0x00000000
-#define MSR0_SBZ		0x00000000
-#define MSR1_SBO		0x00000000
-#define MSR1_SBZ		0x00000000
-#define MSR2_SBO		0x00000000
-#define MSR2_SBZ		0x00000000
-#define MSR3_SBO		0x00000000
-#define MSR3_SBZ		0x00000000
+/* NOTE the SBZ flag here,
+   in addition to the 0 bit which  is a part of the opcode */
+#define MSR0_SBO		0x0120F000
+#define MSR0_SBZ		0x0ED00FF0
+#define MSR1_SBO		0x0320F000
+#define MSR1_SBZ		0x0CD00000
+#define MSR2_SBO		0x0160F000
+#define MSR2_SBZ		0x0E900FF0
+#define MSR3_SBO		0x0360F000
+#define MSR3_SBZ		0x0C900000
 
-#define MUL0_SBO		0x00000000
-#define MUL0_SBZ		0x00000000
+#define MUL0_SBO		0x00000090
+#define MUL0_SBZ		0x0FE0F060
 
-#define MVN0_SBO		0x00000000
-#define MVN0_SBZ		0x00000000
-#define MVN1_SBO		0x00000000
-#define MVN1_SBZ		0x00000000
-#define MVN2_SBO		0x00000000
-#define MVN2_SBZ		0x00000000
+#define MVN0_SBO		0x03E00000
+#define MVN0_SBZ		0x0C0F0000
+#define MVN1_SBO		0x01E00000
+#define MVN1_SBZ		0x0E0F0010
+#define MVN2_SBO		0x01E00010
+#define MVN2_SBZ		0x0E0F0080
 
-#define ORR0_SBO		0x00000000
-#define ORR0_SBZ		0x00000000
-#define ORR1_SBO		0x00000000
-#define ORR1_SBZ		0x00000000
-#define ORR2_SBO		0x00000000
-#define ORR2_SBZ		0x00000000
+#define ORR0_SBO		0x03800000
+#define ORR0_SBZ		0x0C6F0000
+#define ORR1_SBO		0x01800000
+#define ORR1_SBZ		0x0E6F0010
+#define ORR2_SBO		0x01800010
+#define ORR2_SBZ		0x0E6F0080
+                      
+#define RSB0_SBO		0x02600000
+#define RSB0_SBZ		0x0D800000
+#define RSB1_SBO		0x00600000
+#define RSB1_SBZ		0x0F800010
+#define RSB2_SBO		0x00600010
+#define RSB2_SBZ		0x0F800080
 
-#define RSB0_SBO		0x00000000
-#define RSB0_SBZ		0x00000000
-#define RSB1_SBO		0x00000000
-#define RSB1_SBZ		0x00000000
-#define RSB2_SBO		0x00000000
-#define RSB2_SBZ		0x00000000
+#define RSC0_SBO		0x02E00000
+#define RSC0_SBZ		0x0D000000
+#define RSC1_SBO		0x00E00000
+#define RSC1_SBZ		0x0F000010
+#define RSC2_SBO		0x00E00010
+#define RSC2_SBZ		0x0F000080
 
-#define RSC0_SBO		0x00000000
-#define RSC0_SBZ		0x00000000
-#define RSC1_SBO		0x00000000
-#define RSC1_SBZ		0x00000000
-#define RSC2_SBO		0x00000000
-#define RSC2_SBZ		0x00000000
+#define SBC0_SBO		0x02C00000
+#define SBC0_SBZ		0x0D200000
+#define SBC1_SBO		0x00C00000
+#define SBC1_SBZ		0x0F200010
+#define SBC2_SBO		0x00C00010
+#define SBC2_SBZ		0x0F200080
 
-#define SBC0_SBO		0x00000000
-#define SBC0_SBZ		0x00000000
-#define SBC1_SBO		0x00000000
-#define SBC1_SBZ		0x00000000
-#define SBC2_SBO		0x00000000
-#define SBC2_SBZ		0x00000000
+#define SMLAL0_SBO		0x00E00090
+#define SMLAL0_SBZ		0x0F000060
 
-#define SMLAL0_SBO		0x00000000
-#define SMLAL0_SBZ		0x00000000
+#define SMULL_SBO		0x00C00090
+#define SMULL_SBZ		0x0F200060
 
-#define SMULL_SBO		0x00000000
-#define SMULL_SBZ		0x00000000
+#define STC0_SBO		0x0C000000
+#define STC0_SBZ		0x02100000
 
-#define STC0_SBO		0x00000000
-#define STC0_SBZ		0x00000000
-
-#define STM0_SBO		0x00000000
-#define STM0_SBZ		0x00000000
-#define STM1_SBO		0x00000000
-#define STM1_SBZ		0x00000000
-#define STM2_SBO		0x00000000
-#define STM2_SBZ		0x00000000
+#define STM0_SBO		0x08400000
+#define STM0_SBZ		0x06308000
+#define STM1_SBO		0x08000000
+#define STM1_SBZ		0x06500000
+#define STM2_SBO		0x08408000
+#define STM2_SBZ		0x06100000
 
 #define STR0_SBO		0x00000000
 #define STR0_SBZ		0x00000000
