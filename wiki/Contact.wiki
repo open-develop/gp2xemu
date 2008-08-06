@@ -1,4 +1,4 @@
-#Contact and discussion information
+#summary Contact and discussion information
 
 = Contact =
 
