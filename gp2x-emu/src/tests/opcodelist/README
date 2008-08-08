@@ -1,0 +1,6 @@
+This is a unit test to verify the opcodes in /trunk/gp2x-emu/src/opcodelist.h
+Edit the Makefile to match your ARM-toolchain.
+
+opcodes.s should be compiled with GNU ARM as, and stripped with `objcopy -O binary <infile> <outfile>`,
+as opcodelist.c doesn't expect an ELF or PE header.
+opcodelist.c should be compiled with your machine as target, i.e "normal" mingw/gcc.

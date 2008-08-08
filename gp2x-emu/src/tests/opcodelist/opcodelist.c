@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "../../../opcodelist.h"
-#include "../../../opcodes.h"
+#include "../../opcodelist.h"
+#include "../../opcodes.h"
 
 #define OPDEC(name, num) {name ## num ## _SBO, name##num##_SBZ, #name #num , NULL}
 

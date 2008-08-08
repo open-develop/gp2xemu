@@ -1,4 +1,4 @@
-@@ Arithmetic, logical and comparsion instructions with 
+@@ Arithmetic, logical and comparsion instructions with
 @@ barrel shifter (Adress Mode 1 according to ARM ARM) are first listed
 @@
 ADC r0, r1, #255
@@ -195,9 +195,9 @@ TST r0, r1, ASR r3
 TST r0, r1, ROR r3
 
 @@ Branches
-B  0x00123456
-BL 0x00123456
-BX 0x00345678
+B  0x00123454
+BL 0x00123454
+BX r0
 
 @@ PSR instructions
 MRS r0, cpsr
@@ -208,3 +208,21 @@ MSR spsr_c, #1020
 MSR spsr_cxsf, r0
 
 @@ Multiplication instructions
+MUL r0, r1, r2
+SMLAL r0, r1, r2, r3
+SMULL r0, r1, r2, r3
+UMLAL r0, r1, r2, r3
+UMULL r0, r1, r2, r3
+
+@@ Co-processor instructions. CDP, LDC and STC are not used by the CP15 coprocessor.
+CDP p15, 10, cr1, cr2, cr3, 4
+LDC p15, c0, [r0, #64]
+LDC p15, c0, [r0, #64]!
+LDC p15, c0, [r0], #64
+LDC p15, c0, [r0], {127}
+LDCL p15, c0, [r0, #64]
+LDCL p15, c0, [r0, #64]!
+LDCL p15, c0, [r0], #64
+LDCL p15, c0, [r0], {127}
+MCR p15, 0, r0, c1, c2, 4
+@@ Memory-related instructions
