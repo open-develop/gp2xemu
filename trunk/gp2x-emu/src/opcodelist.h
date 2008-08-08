@@ -56,8 +56,8 @@
 #define BX0_SBO			0x012FFF10
 #define BX0_SBZ			0x0ED000E0
 
-#define CDP0_SBO		0x0E000000
-#define CDP0_SBZ		0x01000010
+#define CDP0_SBO		0x0E000000 //Not used by CP15
+#define CDP0_SBZ		0x01000010 //Causes undefined instruction exception
 
 #define CMN0_SBO		0x03700000
 #define CMN0_SBZ		0x0C80F000
@@ -80,8 +80,8 @@
 #define EOR2_SBO		0x00200010
 #define EOR2_SBZ		0x0FC00080
 
-#define LDC0_SBO		0x0C100000
-#define LDC0_SBZ		0x02000000
+#define LDC0_SBO		0x0C100000 //Not used by CP15
+#define LDC0_SBZ		0x02000000 //Causes undefined instruction exception
 
 #define LDM0_SBO		0x08500000
 #define LDM0_SBZ		0x06208000
@@ -189,8 +189,8 @@
 #define SMULL0_SBO		0x00C00090
 #define SMULL0_SBZ		0x0F200060
 
-#define STC0_SBO		0x0C000000
-#define STC0_SBZ		0x02100000
+#define STC0_SBO		0x0C000000 //Not used by CP15
+#define STC0_SBZ		0x02100000 //Causes undefined instruction exception
 
 #define STM0_SBO		0x08400000
 #define STM0_SBZ		0x06308000
@@ -248,7 +248,7 @@
 #define TST2_SBZ		0x0EE0F080
 
 #define UMLAL0_SBO		0x00A00090
-#define UMLAL0_SBZ		0x0F300060
+#define UMLAL0_SBZ		0x0F400060
 
 #define UMULL0_SBO		0x00800090
 #define UMULL0_SBZ		0x0F600060
