@@ -2,6 +2,8 @@
 #define OPCODES_H_
 #include "opcodelist.h"
 
+#define ARITHMETIC_S_FLAG_MASK (1<<20)
+
 typedef unsigned int instr_t;
 typedef int (*opcode_callback_t)(unsigned int, instr_t);
 
