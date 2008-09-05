@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="..\..\src\addrmode.c" open="1" top="0" tabpos="3">
+	<File name="../../src/addrmode.c" open="1" top="0" tabpos="3">
 		<Cursor position="83" topLine="0" />
 	</File>
-	<File name="..\..\src\addrmode.h" open="1" top="0" tabpos="4">
-		<Cursor position="418" topLine="5" />
+	<File name="../../src/addrmode.h" open="1" top="0" tabpos="4">
+		<Cursor position="418" topLine="0" />
 	</File>
-	<File name="..\..\src\cpu.h" open="1" top="1" tabpos="6">
-		<Cursor position="400" topLine="0" />
+	<File name="../../src/cpu.h" open="1" top="1" tabpos="6">
+		<Cursor position="166" topLine="0" />
 	</File>
-	<File name="..\..\src\opcodelist.h" open="1" top="0" tabpos="1">
-		<Cursor position="0" topLine="0" />
+	<File name="../../src/instructions.c" open="1" top="0" tabpos="7">
+		<Cursor position="307" topLine="0" />
 	</File>
-	<File name="..\..\src\opcodes.h" open="1" top="0" tabpos="2">
-		<Cursor position="102" topLine="0" />
+	<File name="../../src/opcodelist.h" open="1" top="0" tabpos="1">
+		<Cursor position="1184" topLine="15" />
 	</File>
-	<File name="..\..\src\registers.h" open="1" top="0" tabpos="5">
+	<File name="../../src/opcodes.h" open="1" top="0" tabpos="2">
+		<Cursor position="383" topLine="0" />
+	</File>
+	<File name="../../src/registers.h" open="1" top="0" tabpos="5">
 		<Cursor position="91" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

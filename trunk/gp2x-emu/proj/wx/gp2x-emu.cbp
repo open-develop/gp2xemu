@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\Debug\libgp2x-emu" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug\" />
+				<Option output="bin/Debug/libgp2x-emu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -18,8 +18,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\Release\libgp2x-emu" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option output="bin/Release/libgp2x-emu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -35,17 +35,21 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="..\..\src\addrmode.c">
+		<Unit filename="../../src/addrmode.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\src\addrmode.h" />
-		<Unit filename="..\..\src\cpu.h" />
-		<Unit filename="..\..\src\opcodelist.h" />
-		<Unit filename="..\..\src\opcodes.h" />
-		<Unit filename="..\..\src\registers.h" />
+		<Unit filename="../../src/addrmode.h" />
+		<Unit filename="../../src/cpu.h" />
+		<Unit filename="../../src/instructions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/opcodelist.h" />
+		<Unit filename="../../src/opcodes.h" />
+		<Unit filename="../../src/registers.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
