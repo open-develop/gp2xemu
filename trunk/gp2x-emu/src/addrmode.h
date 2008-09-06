@@ -9,11 +9,11 @@ typedef unsigned char offset8_t;
 typedef unsigned int offset12_t;
 
 /* 32-bit immediate */
-imm32_t AddrMode1_0(instr_t instr);
+imm32_t AddressModeArithmetic0(instr_t instr);
 /* immediate shift, no shift or rotate right with extend*/
-imm32_t int AddrMode1_1(instr_t instr);
+imm32_t AddressModeArithmetic1(instr_t instr);
 /* register shift */
-imm32_t int AddrMode1_2(instr_t instr);
+imm32_t AddressModeArithmetic2(instr_t instr);
 
 #endif
 
