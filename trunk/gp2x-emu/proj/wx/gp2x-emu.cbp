@@ -43,6 +43,9 @@
 		<Unit filename="../../src/instructions.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../src/mainloop.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../src/opcodelist.h" />
 		<Unit filename="../../src/opcodes.h" />
 		<Unit filename="../../src/registers.h" />
