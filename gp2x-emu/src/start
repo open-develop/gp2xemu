@@ -1,2 +1,0 @@
-#!/bin/tcsh
-vim src/*.c include/*.h src/recARM/*.c
