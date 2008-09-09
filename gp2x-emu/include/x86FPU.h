@@ -14,7 +14,9 @@ typedef enum{
 }x86FPUReg;
 
 void f2xm1(void);
+#if 0 /* conflicts with gcc-builtin fabs */
 void fabs(void);
+#endif
 void faddST0(x86FPUReg );
 void faddSTi(x86FPUReg );
 void faddpSTi(x86FPUReg );
