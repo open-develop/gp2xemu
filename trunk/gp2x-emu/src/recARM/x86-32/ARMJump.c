@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arm_emu.h>
-#include <arm920t.h>
+#include <ARMx86.h>
 #include <ARMJump.h>
 #include <x86.h>
 #define JADDR (CPU.currentInst&0xffffffU)

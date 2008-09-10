@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <arm_emu.h>
-#include <arm920t.h>
+#include <ARMx86.h>
 #include <x86.h>
 #include <ARMArit.h>
 #include <ARMMisc.h>
