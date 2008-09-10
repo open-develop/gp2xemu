@@ -1,14 +1,13 @@
 
 
 DEVICES  := src/devices/
-#RECARM	 := src/recARM/
-INTERP   := src/interpARM
+RECARM	 := src/recARM/
 X8632	 := src/recARM/x86-32/
 SRC	 := src/
 OBJ	 := .obj/
 
 
-ALLDIRS := $(DEVICES) $(INTERP) $(X8632) $(SPARC64)  $(SRC) $(OBJ) 
+ALLDIRS := $(DEVICES) $(RECARM) $(X8632) $(SPARC64)  $(SRC) $(OBJ) 
 
 
 vpath %.c src:src/recARM:src/recARM/x86-32:src/devices:src/recARM/SPARC
