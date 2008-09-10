@@ -2,6 +2,7 @@
 #define _ARMX86_H_
 
 #include <arm920t.h>
+#include <x86.h>
 
 #define CHECK_CONDITION(slot)	{\
 			pushI32(_COND_);\
@@ -65,5 +66,19 @@
 #define SAVE_SIGN(reg) {sets(reg);}
 
 #define SAVE_OVERF(reg) { seto(reg);}
+
+
+u32 matchCondition(u32 );
+
+
+
+void leftShiftImm(x86GPReg);
+void rightShiftImm(x86GPReg );
+void leftShiftReg(x86GPReg );
+void rightShiftReg(x86GPReg );
+void aritShiftImm(x86GPReg );
+void aritShiftReg(x86GPReg );
+void rightRotImm(x86GPReg );
+void rightRotReg(x86GPReg );
 
 #endif
