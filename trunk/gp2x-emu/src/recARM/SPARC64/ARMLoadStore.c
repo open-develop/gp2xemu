@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <arm_emu.h>
-#include <arm920t.h>
-#include <x86.h>
+#include <ARMsparc64.h>
 #include <ARMArit.h>
 #include <ARMLoadStore.h>
 #include <MMU.h>
+#include <sparc64.h>
 
 
 
@@ -61,11 +61,6 @@ void recLDM1(void){
 		fprintf(stderr,"recLDM1(): _Rn_ == 15\n");
 	}
 #endif
-	pushI32(_Rn_);
-	push32M(&GPR(_Rn_).sVal);
-	CALLFUNC(loadMultRegs);
-	add32ItoR(8,ESP);
-	x86SetJI8(x86Tmp[0]);
 }
 
 
@@ -78,11 +73,6 @@ void recLDM2(void){
 		fprintf(stderr,"recLDM2(): _Rn_ == 15\n");
 	}
 #endif 
-	pushI32(_Rn_);
-	push32M(&GPR(_Rn_).sVal);
-	CALLFUNC(loadMultRegs);
-	add32ItoR(8,ESP);
-	x86SetJI8(x86Tmp[0]);
 }
 
 
