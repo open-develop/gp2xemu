@@ -13,7 +13,7 @@ u32 matchCondition(u32 );
 void recB(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(JADDR,EAX);
 	mov32RtoR(EAX,ECX);
 	shr32R(ECX,0x10U);
@@ -34,7 +34,7 @@ void recB(void){
 void recBL(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(JADDR,EAX);
 	mov32RtoR(EAX,ECX);
 	shr32R(ECX,0x10);
@@ -65,7 +65,7 @@ void recBL(void){
 void recBX(void){
 	
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32RtoR(EAX,ECX);
 	mov32ItoR(CPSR.sVal,EDX);
@@ -84,9 +84,9 @@ void recBX(void){
 
 
 void recBLX(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recBLXSpe(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }

@@ -12,21 +12,21 @@ void recNULL(void){
 	/* should write nop's? 
 	 */
 	printf("ARMMisc.c: recNULL() fixme\n");
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 
 
 void recSWI(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 
 void recSWP(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	/*mov32ItoR(GPR(_Rn_).sVal,EAX);*/
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
@@ -39,13 +39,13 @@ void recSWPB(void){
 
 
 	fprintf(stderr,"ARMMisc: recSWPB()\n");
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recTEQi(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,ECX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -62,7 +62,7 @@ void recTEQs(void){
 	__register u32 val=((CPU.currentInst>>4)&0x7U);
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
 	shiftDispatch[val](EAX);
@@ -78,7 +78,7 @@ void recTEQs(void){
 void recTSTi(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
 	test32RtoM(EAX,&GPR(_Rn_));
@@ -95,7 +95,7 @@ void recTSTs(void){
 	__register u32 val=((CPU.currentInst>>4)&0x7U);
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	shiftDispatch[val](EAX);
 	UPDATE_CARRY(1);
@@ -109,7 +109,7 @@ void recTSTs(void){
 
 void recCDP(void){
 	printf("fixme: recCDP()\ncoprocessor\n");
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	return ;
 }
 
@@ -117,7 +117,7 @@ void recCDP(void){
 void recCMPi(void){
 	
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
 	cmp32RtoM(EAX,&GPR(_Rn_));
@@ -135,7 +135,7 @@ void recCMPs(void){
 	__register u32 val=((CPU.currentInst>>4)&0x7U);
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	shiftDispatch[val](EAX);
 	cmp32RtoM(EAX,&GPR(_Rn_));
@@ -151,7 +151,7 @@ void recCMPs(void){
 void recCMNi(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,ECX);
 	neg32R(EAX);
@@ -176,7 +176,7 @@ void recCMNs(void){
 
 	/* preload Rm/Rn registers, and check condition*/
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
 	shiftDispatch[val](EAX);

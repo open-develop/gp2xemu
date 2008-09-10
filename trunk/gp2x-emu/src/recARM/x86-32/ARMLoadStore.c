@@ -16,7 +16,7 @@ static void loadMultRegs(u32 addr, u32 regNum){
 
 
 	int counter=0;
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	while(counter<16){
 
@@ -41,7 +41,7 @@ static void storeMultRegs(u32 addr, u32 regNum){
 
 	int counter=0;
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	while(counter<16){
 		
 		if(CINST&(1<<counter)){
@@ -64,7 +64,7 @@ void recLDM1(void){
 		fprintf(stderr,"recLDM1(): _Rn_ == 15\n");
 	}
 #endif
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	pushI32(_Rn_);
 	push32M(&GPR(_Rn_).sVal);
 	CALLFUNC(loadMultRegs);
@@ -82,7 +82,7 @@ void recLDM2(void){
 		fprintf(stderr,"recLDM2(): _Rn_ == 15\n");
 	}
 #endif 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	pushI32(_Rn_);
 	push32M(&GPR(_Rn_).sVal);
 	CALLFUNC(loadMultRegs);
@@ -99,7 +99,7 @@ void recLDM3(void){
 void recLDR(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	push32M(&GPR(_Rd_));
@@ -125,7 +125,7 @@ void recLDRu(void){
 void recLDRp(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	sub32RfmM(ECX,&GPR(_Rd_));
@@ -138,7 +138,7 @@ void recLDRp(void){
 void recLDRup(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	add32RtoM(ECX,&GPR(_Rd_));
@@ -153,7 +153,7 @@ void recLDRup(void){
 void recLDRi(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),EAX);
 	sub32RfmM(EAX,&GPR(_Rd_));
@@ -169,7 +169,7 @@ void recLDRi(void){
 void recLDRiu(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),EAX);
 	shiftDispatch[(CINST>>4)&0x7](EAX);
@@ -184,7 +184,7 @@ void recLDRiu(void){
 void recLDRip(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),EAX);
 	sub32RfmM(EAX,&GPR(_Rd_));
@@ -198,7 +198,7 @@ void recLDRip(void){
 void recLDRiup(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	mov32MtoR(&GPR(_Rm_),EAX);
 	add32RtoM(EAX,&GPR(_Rd_));
@@ -211,188 +211,188 @@ void recLDRiup(void){
 }
 
 void recSTR(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recSTRi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 
 void recLDRB(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBup(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recLDRBi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRBiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recSTRB(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recSTRBi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRBiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 
 void recLDRH(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recLDRHi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRHiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recSTRH(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recSTRHi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recSTRHiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 
 
 void recLDRSB(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recLDRSBi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSBiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recLDRSH(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHp(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 
 void recLDRSHi(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHiu(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHip(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }
 void recLDRSHiup(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 }

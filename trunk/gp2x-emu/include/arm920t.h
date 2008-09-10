@@ -4,9 +4,9 @@
 
 
 #ifdef _DEBUG_
-#define DEBUG_PRINT printf("function: %s\n",__FUNCTION__);
+#define  DEBUG_PRINT() do {printf("function: %s\n",__FUNCTION__);} while(0)
 #else
-#define DEBUG_PRINT 
+#define DEBUG_PRINT() do{}while(0)
 #endif
 
 
