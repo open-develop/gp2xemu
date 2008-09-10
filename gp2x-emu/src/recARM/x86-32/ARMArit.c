@@ -60,6 +60,7 @@ void rightRotImm(x86GPReg reg){
 	__register u32 imm=((CPU.currentInst>>7)&0x1fU);
 
 	if(!imm)
+		/* shouln't that be a RRX? */
 		shr32R1(reg);
 
 	else{

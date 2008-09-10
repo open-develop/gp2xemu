@@ -4,7 +4,6 @@
 #include <arm_emu.h>
 #include <ARMsparc64.h>
 #include <ARMArit.h>
-#include <sparc64.h>
 /*#warning "S-flag still has to be added"
  */
 

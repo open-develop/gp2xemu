@@ -1,16 +1,5 @@
 #ifndef _ARMArit_h_
 #define _ARMArit_h_
-#include <x86.h>
-
-
-void leftShiftImm(x86GPReg);
-void rightShiftImm(x86GPReg );
-void leftShiftReg(x86GPReg );
-void rightShiftReg(x86GPReg );
-void aritShiftImm(x86GPReg );
-void aritShiftReg(x86GPReg );
-void rightRotImm(x86GPReg );
-void rightRotReg(x86GPReg );
 
 void recADCi(void);
 void recADCs(void);
@@ -39,10 +28,6 @@ void recMRCi(void);
 void recMRCs(void);
 void recMVNi(void);
 void recMVNs(void);
-
-
-u32 matchCondition(u32 );
-
 
 
 
