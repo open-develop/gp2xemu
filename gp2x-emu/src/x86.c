@@ -7,7 +7,6 @@
 
 /* x86 functions which write the opcodes into memory, still incomplete though */
 
-
 extern u8 *code_ptr;
 
 

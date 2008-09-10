@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arm_emu.h>
-#include <arm920t.h>
+#include <ARMx86.h>
 #include <ARMDivMul.h>
 #include <x86.h>
 /* since the ARM switched the position of Rd and Rn in multiply instructions i redefine them */ 
