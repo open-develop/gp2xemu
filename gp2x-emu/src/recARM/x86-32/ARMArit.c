@@ -79,7 +79,7 @@ void rightRotReg(x86GPReg reg){
 
 void recADDi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -107,7 +107,7 @@ void recADDs(void){
 	/* preload Rm/Rn registers, and check condition 
 	 */
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -129,7 +129,7 @@ void recADDs(void){
 
 void recADCi(void){
 	
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -154,7 +154,7 @@ void recADCs(void){
 
 	/* preload Rm/Rn registers, and check condition
 	 */
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -171,7 +171,7 @@ void recADCs(void){
 
 void recANDi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -196,7 +196,7 @@ void recANDs(void){
 
 	/* preload Rm/Rn registers, and check condition
 	 */
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -218,7 +218,7 @@ void recANDs(void){
 
 void recSUBi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -261,7 +261,7 @@ void recSUBs(void){
 
 void recEORi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -285,7 +285,7 @@ void recEORs(void){
 	 */
 
 	/* preload Rm/Rn registers, and check condition*/
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -304,7 +304,7 @@ void recEORs(void){
 		
 void recORRi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -328,7 +328,7 @@ void recORRs(void){
 	 */
 
 	/* preload Rm/Rn registers, and check condition*/
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -348,7 +348,7 @@ void recORRs(void){
 
 void recRSBi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -373,7 +373,7 @@ void recRSBs(void){
 
 	/* preload Rm/Rn registers, and check condition
 	 */
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -394,7 +394,7 @@ void recRSBs(void){
 
 void recRSCi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -420,7 +420,7 @@ void recRSCs(void){
 	 */
 
 	/* preload Rm/Rn registers, and check condition*/
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -442,7 +442,7 @@ void recRSCs(void){
 
 void recSBCi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -469,7 +469,7 @@ void recSBCs(void){
 	 */
 
 	/* preload Rm/Rn registers, and check condition*/
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rn_).sVal,EDX);
@@ -490,7 +490,7 @@ void recSBCs(void){
 
 
 void recCLZ(void){
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	bsr32RtoR(EAX,ECX);
@@ -503,7 +503,7 @@ void recCLZ(void){
 
 void recBICi(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
@@ -530,7 +530,7 @@ void recBICs(void){
 	/*__register u32 imm=((CPU.currentInst>>7)&0x1fU);
 	 */
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	/* preload Rm/Rn registers, and check condition*/
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
@@ -552,7 +552,7 @@ void recBICs(void){
 void recMOVi(void){
 
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
 	if(_UPDATE_FLAGS_)
@@ -575,7 +575,7 @@ void recMOVs(void){
 	 */
 
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 #if 0
@@ -627,7 +627,7 @@ void recMOVs(void){
 void recMVNi(void){
 	
 	CHECK_CONDITION(0);
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(_IMM_,EAX);
 	ror32R(EAX,shift_table[_RORIMM_]);
 	if(_UPDATE_FLAGS_)
@@ -650,7 +650,7 @@ void recMVNs(void){
 	/*__register u32 imm=((CPU.currentInst>>7)&0x1fU);
 	 */
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 
 	CHECK_CONDITION(0);
 	mov32ItoR(GPR(_Rm_).sVal,EAX);

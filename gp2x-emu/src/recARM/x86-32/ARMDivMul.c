@@ -19,7 +19,7 @@
 
 void recMUL(void){
 
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	CHECK_CONDITION(0)
 	mov32ItoR(GPR(_Rs_).sVal,EAX);
 	mov32ItoR(GPR(_Rm_).sVal,ECX);
@@ -37,7 +37,7 @@ void recMUL(void){
 void recMLA(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rs_).sVal,EAX);
 	mov32ItoR(GPR(_Rm_).sVal,ECX);
 	imul32RtoR(EAX,ECX);
@@ -57,7 +57,7 @@ void recSMULL(void){
 
 	CHECK_CONDITION(0)
 	
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rs_).sVal,ECX);
 	imul32R(ECX);
@@ -76,7 +76,7 @@ void recSMULL(void){
 void recSMLAL(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rs_).sVal,ECX);
 	mov32ItoR(GPR(_Rdhi_).sVal,ESI);
@@ -100,7 +100,7 @@ void recSMLAL(void){
 void recUMULL(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rs_).sVal,ECX);
 	mul32R(ECX);
@@ -120,7 +120,7 @@ void recUMULL(void){
 void recUMLAL(void){
 
 	CHECK_CONDITION(0)
-	DEBUG_PRINT
+	DEBUG_PRINT();
 	mov32ItoR(GPR(_Rm_).sVal,EAX);
 	mov32ItoR(GPR(_Rs_).sVal,ECX);
 	mov32ItoR(GPR(_Rdhi_).sVal,ESI);
