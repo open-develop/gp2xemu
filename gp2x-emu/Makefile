@@ -1,8 +1,7 @@
 
 
 DEVICES  := src/devices/
-RECARM	 := src/interpARM/
-#INTERP	 := src/interpARM
+RECARM	 := src/recARM/
 X8632	 := src/recARM/x86-32/
 SRC	 := src/
 OBJ	 := .obj/
