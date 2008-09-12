@@ -134,4 +134,63 @@ shifter_result adr1_lsr_reg(u32 instruction, cpu_t* cpu)
     return out;
 }
 
+shifter_result adr1_asr_imm(u32 instruction, cpu_t* cpu)
+{
+    u32 shift_imm, index, regval;
+    shifter_result out;
+    
+    shift_imm = (instruction >> 7) & 0x1F;
+    index = instruction & 0xF;
+    regval = (*(cpu->regs.r[index]);
+    if(index == 15)
+        regval += 8;
+    if(!shift_imm){
+        if(regval & (1<<31)){
+            out.shifter_carry_out = 1;
+            out.shifter_operand = 0xFFFFFFFF;
+        } else {
+            out.shifter_carry_out = 0;
+            out.shifter_operand = 0;
+        }
+        return out;
+    }
+    out.shifter_carry_out = (signed)regval >> shift_imm;
+    out.shifter_operand = regval & (1<<(shift_imm - 1)) ? 1 : 0;
+    return out;
+}
 
+shifter_result adr1_asr_reg(u32 instruction, cpu_t* cpu)
+{
+    u32 index1, index2, regval1. regval2;
+    shifter_result out;
+    
+    index1 = (instruction >> 8) & 0xF; /* Rs index */
+    index2 = instruction & 0xF; /* Rm index */
+    regval1 = (*(cpu->regs.r[index1]) & 0xFF;
+    regval2 = (*(cpu->regs.r[index2]);
+#if 0
+    if(index1 == 15 || index2 == 15)
+        ASSERT(!"Using R15 with this address mode is UNPREDICTABLE");
+#endif
+    if(!regval1){
+        out.shifter_carry_out = PSR_C_FLAG(cpu->regs.cpsr);
+        out.shifter_operand = regval2;
+    } else if(regval1 < 32) {
+        out.shifter_carry_out = regval2 & (1<<(regval1 - 1)) ? 1 : 0;
+        out.shifter_operand = (signed)regval2 << regval1;
+    } else if(regval1 >= 32){
+        if(regval2 & (1<<31)){
+            out.shifter_carry_out = 1;
+            out.shifter_operand = 0xFFFFFFFF;
+        } else {
+            out.shifter_carry_out = 0;
+            out.shifter_operand = 0;
+        }
+    }
+    return out;
+}
+
+shifter_result adr1_ror_imm(u32 instruction, cpu_t* cpu)
+{
+    
+}
