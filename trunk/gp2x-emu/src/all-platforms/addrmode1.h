@@ -1,6 +1,8 @@
 #ifndef ADRMODE1_GUARD
 #define ADRMODE1_GUARD
 
+#define REG(x) (*(cpu->regs.r[x])
+
 #define PSR_STATUS_FLAGS 0x1B
 #define PSR_V_FLAG(x) ((x>>28) & 0x1)
 #define PSR_C_FLAG(x) ((x>>29) & 0x1)
