@@ -1,6 +1,6 @@
 #include "adrmode1.h"
 
-shifter_result adr1_immediate(u32 instruction, cpu_t* cpu)
+shifter_result adr1_imm(u32 instruction, cpu_t* cpu)
 {
     rotate_imm, immed8;
     shifter_result out;
@@ -40,7 +40,7 @@ shifter_result adr1_lsl_imm(u32 instruction, cpu_t* cpu)
 {
     u32 shift_imm, index, regval;
     shifter_result out;
-    
+
     shift_imm = (instruction >> 7) & 0x1F;
     index = instruction & 0xF;
     regval = (*(cpu->regs.r[index]);
@@ -60,7 +60,7 @@ shifter_result adr1_lsl_reg(u32 instruction, cpu_t* cpu)
 {
     u32 index1, index2, regval1. regval2;
     shifter_result out;
-    
+
     index1 = (instruction >> 8) & 0xF; /* Rs index */
     index2 = instruction & 0xF; /* Rm index */
     regval1 = (*(cpu->regs.r[index1]) & 0xFF;
@@ -89,7 +89,7 @@ shifter_result adr1_lsr_imm(u32 instruction, cpu_t* cpu)
 {
     u32 shift_imm, index, regval;
     shifter_result out;
-    
+
     shift_imm = (instruction >> 7) & 0x1F;
     index = instruction & 0xF;
     regval = (*(cpu->regs.r[index]);
@@ -109,7 +109,7 @@ shifter_result adr1_lsr_reg(u32 instruction, cpu_t* cpu)
 {
     u32 index1, index2, regval1. regval2;
     shifter_result out;
-    
+
     index1 = (instruction >> 8) & 0xF; /* Rs index */
     index2 = instruction & 0xF; /* Rm index */
     regval1 = (*(cpu->regs.r[index1]) & 0xFF;
@@ -138,7 +138,7 @@ shifter_result adr1_asr_imm(u32 instruction, cpu_t* cpu)
 {
     u32 shift_imm, index, regval;
     shifter_result out;
-    
+
     shift_imm = (instruction >> 7) & 0x1F;
     index = instruction & 0xF;
     regval = (*(cpu->regs.r[index]);
@@ -163,7 +163,7 @@ shifter_result adr1_asr_reg(u32 instruction, cpu_t* cpu)
 {
     u32 index1, index2, regval1. regval2;
     shifter_result out;
-    
+
     index1 = (instruction >> 8) & 0xF; /* Rs index */
     index2 = instruction & 0xF; /* Rm index */
     regval1 = (*(cpu->regs.r[index1]) & 0xFF;
@@ -190,7 +190,65 @@ shifter_result adr1_asr_reg(u32 instruction, cpu_t* cpu)
     return out;
 }
 
+/* This is really just adr1_ror_imm with zero as shift immediate. See below. */
+shifter_result adr1_rrx(u32 instruction, cpu_t* cpu)
+{
+    u32 index, regval;
+    shifter_result out;
+
+    index = instruction & 0xF;
+    regval = (*(cpu->regs.r[index]);
+    if(index == 15)
+        regval += 8;
+    out.shifter_carry_out = regval & 1;
+    out.shifter_operand = (PSR_C_FLAG(cpu->regs.cpsr) << 31) | (regval >> 1);
+    return out;
+}
+
 shifter_result adr1_ror_imm(u32 instruction, cpu_t* cpu)
 {
-    
+    u32 shift_imm, index, regval;
+    shifter_result out;
+
+    shift_imm = (instruction >> 7) & 0x1F;
+    index = instruction & 0xF;
+    regval = (*(cpu->regs.r[index]);
+    if(index == 15)
+        regval += 8;
+    if(!shift_imm){ /* shift_imm is zero, so perform RRX */
+        out.shifter_carry_out = regval & 1;
+        out.shifter_operand = (PSR_C_FLAG(cpu->regs.cpsr) << 31) | (regval >> 1);
+    }
+
+    out.shifter_operand = (regval >> shift_imm) | (regval << (32 - shift_imm));
+    out.shifter_carry_out = regval & (1<<(shift_imm - 1)) ? 1 : 0;
+    return out;
+}
+
+shifter_result adr1_ror_reg(u32 instruction, cpu_t* cpu)
+{
+    u32 index1, index2, regval1. regval2;
+    shifter_result out;
+
+    index1 = (instruction >> 8) & 0xF; /* Rs index */
+    index2 = instruction & 0xF; /* Rm index */
+    regval1 = (*(cpu->regs.r[index1]) & 0xFF;
+    regval2 = (*(cpu->regs.r[index2]);
+#if 0
+    if(index1 == 15 || index2 == 15)
+        ASSERT(!"Using R15 with this address mode is UNPREDICTABLE");
+#endif
+    if(!regval1){
+        out.shifter_carry_out = PSR_C_FLAG(cpu->regs.cpsr);
+        out.shifter_operand = regval2;
+    } else if(regval1 & 0x1F) {
+        regval &= 1F;
+        out.shifter_carry_out = (regval2 >> regval1) | (regval2 << (32 - regval1));
+        out.shifter_operand = regval2 & (1 << (regval1 - 1));
+    } else {
+        regval &= 1F;
+        out.shifter_carry_out = regval2 & (1<<31) ? 1 : 0;
+        out.shifter_operand = regval2;
+    }
+    return out;
 }
