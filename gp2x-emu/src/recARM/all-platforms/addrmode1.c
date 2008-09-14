@@ -227,7 +227,7 @@ shifter_result adr1_ror_imm(u32 instruction, cpu_t* cpu)
 
 shifter_result adr1_ror_reg(u32 instruction, cpu_t* cpu)
 {
-    u32 index1, index2, regval1, regval2;
+    u32 index1, index2, regval1. regval2;
     shifter_result out;
 
     index1 = (instruction >> 8) & 0xF; /* Rs index */
