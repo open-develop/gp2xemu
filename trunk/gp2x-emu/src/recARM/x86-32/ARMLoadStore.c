@@ -232,7 +232,7 @@ void recSTRu(void){
 	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 
-	mov32MtoR(&(GPR(_Rm_), ECX));
+	mov32MtoR(&GPR(_Rm_), ECX);
 	push32M(&GPR(_Rd_));
 	push32M(&GPR(_Rn_));
 	add32RtoM(ECX,&GPR(_Rn_));
@@ -292,7 +292,7 @@ void recSTRiu(void){
 	CHECK_CONDITION(0)
 	DEBUG_PRINT();
 
-	push32M(&GPR(_Rd_))
+	push32M(&GPR(_Rd_));
 	mov32MtoR(&GPR(_Rm_),EAX);
 	push32M(&GPR(_Rn_));
 	shiftDispatch[(CINST>>4)&0x7](EAX);
@@ -330,7 +330,7 @@ void recSTRiup(void){
 	push32M(&GPR(_Rn_));
 	CALLFUNC(writeMemU32);
 
-	x86SetJI8(x86Tmp);
+	x86SetJI8(x86Tmp[0]);
 }
 
 
@@ -402,7 +402,7 @@ void recLDRBi(void){
 	shiftDispatch[(CINST>>4)&0x7](EAX);
 	push32M(&GPR(_Rn_));
 	CALLFUNC(readMemU8);
-	movzx32R8toR32(AL,EAX);
+	movzxR8toR32(AL,EAX);
 	mov32RtoM(EAX,&GPR(_Rd_));
 
 	x86SetJI8(x86Tmp[0]);
@@ -475,7 +475,7 @@ void recSTRBu(void){
 	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 
-	mov32MtoR(&(GPR(_Rm_), ECX));
+	mov32MtoR(&GPR(_Rm_), ECX);
 	push32M(&GPR(_Rd_));
 	push32M(&GPR(_Rn_));
 	add32RtoM(ECX,&GPR(_Rn_));
@@ -563,7 +563,7 @@ void recSTRBiup(void){
 	push32M(&GPR(_Rn_));
 	CALLFUNC(writeMemU8);
 
-	x86SetJI8(x86Tmp);
+	x86SetJI8(x86Tmp[0]);
 }
 
 void recLDRH(void){
@@ -702,7 +702,7 @@ void recSTRHu(void){
 	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 
-	mov32MtoR(&(GPR(_Rm_), ECX));
+	mov32MtoR(&GPR(_Rm_), ECX);
 	push32M(&GPR(_Rd_));
 	push32M(&GPR(_Rn_));
 	add32RtoM(ECX,&GPR(_Rn_));
@@ -759,7 +759,7 @@ void recSTRHiu(void){
 	CHECK_CONDITION(0)
 	DEBUG_PRINT();
 
-	push32M(&GPR(_Rd_))
+	push32M(&GPR(_Rd_));
 	mov32MtoR(&GPR(_Rm_),EAX);
 	push32M(&GPR(_Rn_));
 	shiftDispatch[(CINST>>4)&0x7](EAX);
@@ -795,8 +795,7 @@ void recSTRHiup(void){
 	push32M(&GPR(_Rn_));
 	CALLFUNC(writeMemU16);
 
-	x86SetJI8(x86Tmp);
-}
+	x86SetJI8(x86Tmp[0]);
 }
 
 void recLDRSB(void){
@@ -822,7 +821,7 @@ void recLDRSBu(void){
 	push32M(&GPR(_Rn_));
 	add32RtoM(ECX,&GPR(_Rn_));
 	CALLFUNC(readMemU8);
-	movsxR8ToR32(AL,EAX);
+	movsxR8toR32(AL,EAX);
 	mov32RtoM(EAX,&GPR(_Rd_));
 
 	x86SetJI8(x86Tmp[0]);
@@ -836,9 +835,9 @@ void recLDRSBp(void){
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	sub32RfmM(ECX,&GPR(_Rn_));
-	push32(_Rn_);
+	push32M(&GPR(_Rn_));
 	CALLFUNC(readMemU8);
-	movsxR8ToR32(AX,EAX);
+	movsxR8toR32(AL,EAX);
 	mov32RtoM(EAX,&GPR(_Rd_));
 
 	x86SetJI8(x86Tmp[0]);
@@ -848,9 +847,9 @@ void recLDRSBup(void){
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	add32RtoM(ECX,&GPR(_Rn_));
-	push32(_Rn_);
+	push32M(&GPR(_Rn_));
 	CALLFUNC(readMemU8);
-	movsxR8ToR32(AX,EAX);
+	movsxR8toR32(AL,EAX);
 	mov32RtoM(EAX,&GPR(_Rd_));
 
 	x86SetJI8(x86Tmp[0]);
@@ -941,7 +940,7 @@ void recLDRSHu(void){
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	push32M(&GPR(_Rn_));
-	add32RfmM(ECX,&GPR(_Rn_));
+	add32RtoM(ECX,&GPR(_Rn_));
 	CALLFUNC(readMemU16);
 	movsxR16toR32(AX,EAX);
 	mov32RtoM(EAX,&GPR(_Rd_));
