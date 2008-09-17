@@ -63,6 +63,16 @@ typedef enum {
 	EDI
 }x86GPReg;
 
+enum {
+	AX=0,
+	CX,
+	DX,
+	BX,
+	/*SP,*/
+	BP,
+	SI,
+	DI
+};
 
 typedef enum {
 	AL=0,

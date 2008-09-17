@@ -52,7 +52,10 @@ u32 readMemU32(u32 );
 u16 readMemU16(u32 );
 u8  readMemU8(u32 );
 
+
 void writeMemU32(u32 , u32);
+void writeMemU16(u32, u16 );
+void writeMemU8(u32, u8);
 
 typedef struct {
 	size_t size;
