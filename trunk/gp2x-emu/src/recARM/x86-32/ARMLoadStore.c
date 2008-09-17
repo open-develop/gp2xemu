@@ -259,6 +259,7 @@ void recSTRp(void){
 
 
 void recSTRup(void){
+
 	DEBUG_PRINT();
 	CHECK_CONDITION(0);
 
@@ -844,6 +845,9 @@ void recLDRSBp(void){
 
 }
 void recLDRSBup(void){
+
+	DEBUG_PRINT();
+	CHECK_CONDITION(0);
 
 	mov32MtoR(&GPR(_Rm_),ECX);
 	add32RtoM(ECX,&GPR(_Rn_));
