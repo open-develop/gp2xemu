@@ -58,7 +58,10 @@ typedef enum ARM_Exception
     ARM_Exception_Data_Abort = 0x10,
     ARM_Exception_Interrupt = 0x20,
     ARM_Exception_Fast_Interrupt = 0x40,
-    ARM_Exception_All = 0x7F
+    ARM_Exception_All = 0x7F,
+    /* Not a part of the others. Unpredictable is an unrepairable state
+        which makes the emulator close. */
+    ARM_Exception_Unpredictable = 0x80
 } ARM_Exception;
 
 /* ARM_CPU is just a structure for storing all the registers,

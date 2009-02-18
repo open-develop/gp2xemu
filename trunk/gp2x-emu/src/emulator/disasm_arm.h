@@ -66,7 +66,7 @@ typedef union ARM_Word
 
 typedef enum ARMV4_ConditionType
 {
-    ARM_CondEQ,
+    ARM_CondEQ = 0,
     ARM_CondNE,
     ARM_CondCS,
     ARM_CondCC,

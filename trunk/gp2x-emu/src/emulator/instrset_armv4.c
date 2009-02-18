@@ -80,12 +80,15 @@ static void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* val
     ARM_Word immediate;
     ARM_Word regval;
     uint32_t** reg;
+    int mode;
 
     ASSERT(cpu);
     ASSERT(value);
     ASSERT(carry_out);
+    
+    GetStatusRegisterMode(cpu, CPSR, &mode);
 
-    reg = &cpu->reg[cpu->cpsr.f.mode][0];
+    reg = &cpu->reg[mode][0];
     if(instr.word & (1<<25)){
         /* 32-bit shifted immediate*/
         rotate_imm.word = instr.dp_im.rotate * 2;
@@ -319,6 +322,7 @@ static int handler_and(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -360,6 +364,7 @@ static int handler_eor(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -401,6 +406,7 @@ static int handler_sub(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -442,6 +448,7 @@ static int handler_rsb(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -483,6 +490,7 @@ static int handler_add(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -524,6 +532,7 @@ static int handler_adc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -565,6 +574,7 @@ static int handler_sbc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -607,6 +617,7 @@ static int handler_rsc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -651,6 +662,7 @@ static int handler_tst(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -679,6 +691,7 @@ static int handler_teq(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -707,6 +720,7 @@ static int handler_cmp(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -735,6 +749,7 @@ static int handler_cmn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -763,6 +778,7 @@ static int handler_orr(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -804,6 +820,7 @@ static int handler_mov(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -841,6 +858,7 @@ static int handler_bic(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -882,6 +900,7 @@ static int handler_mvn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
@@ -947,7 +966,7 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         case ARMV4_TypeUnpredictable:
             return -1;
         case ARMV4_TypeDataProcessing:
-            index = instr.dp_is.opcode1 | (instr.dp_is.S<<4);
+            index = (instr.dp_is.opcode1<<1) | instr.dp_is.S;
             return datapr[index](cpu, mem, instr);
         default:
             ASSERT(!"Instruction not yet implemented.\n");

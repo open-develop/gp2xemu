@@ -5,17 +5,24 @@
 #include "../cpu/cpu.h"
 #include "../assert.h"
 
-int InitMemory(ARM_Memory* mem, unsigned int len)
+int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len)
 {
-    ASSERT(mem != NULL);
+    if(!mem || len < NAND_BOOT_LOAD_SIZE*4){
+        ASSERT(!"mem pointer is zero, or len is of illegal size");
+        return -1;
+    }
     /* align to four */
     len = (len + 3) / 4;
-    mem->mem = malloc( len );
-    memset(mem->mem, 0x0BADF00D, len);
-    mem->length = len;
-    if(!mem->mem)
+    mem->mem = malloc( len * 4);
+    memset(mem->mem, 0x0BADF00D, len * 4);
+    mem->length = len * 4;
+    if(!mem->mem){
+        ASSERT(!"Allocation failure.");
         return -1;
-    return len;
+    }
+
+    OnInitNAND(nand, (uint32_t*)mem->mem);
+    return len*4;
 }
 
 void DestroyMemory(ARM_Memory* mem)
