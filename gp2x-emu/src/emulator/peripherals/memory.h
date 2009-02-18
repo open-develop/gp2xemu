@@ -3,6 +3,8 @@
 /* need uint32_t */
 #include <stdint.h>
 #include "../cpu/cpu.h"
+#include "nand.h"
+
 /* TODO:
  * Implement the MMU and MPU interfaces.
  * No support for access regions, memory translation, cache and write buffers for now
@@ -18,7 +20,7 @@ typedef struct ARM_Memory
 } ARM_Memory;
 
 /* len must be a multiple of four */
-int InitMemory(ARM_Memory* mem, unsigned int len);
+int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len);
 void DestroyMemory(ARM_Memory* mem);
 void ReInitializeMemory(ARM_Memory* mem);
 

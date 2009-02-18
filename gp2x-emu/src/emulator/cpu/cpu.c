@@ -101,7 +101,7 @@ void ResetCPU(ARM_CPU* cpu)
     ASSERT( cpu != NULL );
     ResetRegisters(cpu);
     ResetPSR(cpu);
-    cpu->exception = ARM_Exception_Reset;
+    cpu->exception = ARM_Exception_None;
     cpu->cpubusywait = 0;
     cpu->shouldflush = 0;
     return;
@@ -162,11 +162,14 @@ ARM_Exception HandleException(ARM_CPU* cpu)
     /* TODO: Implement proper priorities */
     if(!cpu->exception)
         return ARM_Exception_None;
+    else if(cpu->exception & ARM_Exception_Unpredictable){
+        return ARM_Exception_Unpredictable;
+    }
     else if(cpu->exception & ARM_Exception_Reset){
         ResetCPU(cpu);
         /* ResetMemory(mem); */
         /* LoadBinary(&mem "foo.bin", EXCEPTION_VECTOR_TABLE_RESET); */
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Reset);
         return ARM_Exception_Reset;
     }
@@ -177,7 +180,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.irq = 1; /* disable interrupts (but leave FIQ alone) */
         *(cpu->reg[ARM_CPU_MODE_UND][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_UND;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Undefined);
         return ARM_Exception_Undefined;
     }
@@ -188,7 +191,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.irq = 1;
         *(cpu->reg[ARM_CPU_MODE_SVC][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_SWI;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Software_Interrupt);
         return ARM_Exception_Software_Interrupt;
     }
@@ -199,7 +202,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.irq = 1;
         *(cpu->reg[ARM_CPU_MODE_ABT][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_IABT;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Prefetch_Abort);
         return ARM_Exception_Prefetch_Abort;
     }
@@ -210,7 +213,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.irq = 1;
         *(cpu->reg[ARM_CPU_MODE_ABT][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_DABT;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Data_Abort);
         return ARM_Exception_Data_Abort;
     }
@@ -221,7 +224,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.irq = 1;
         *(cpu->reg[ARM_CPU_MODE_IRQ][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_IRQ;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Interrupt);
         return ARM_Exception_Interrupt;
     }
@@ -233,7 +236,7 @@ ARM_Exception HandleException(ARM_CPU* cpu)
         cpu->cpsr.f.fiq = 1; /* disable FIQ for FIQ exceptions */
         *(cpu->reg[ARM_CPU_MODE_FIQ][LR]) = *(cpu->reg[0][PC]) + 8;
         *(cpu->reg[0][PC]) = EXCEPTION_VECTOR_TABLE_FIQ;
-        cpu->shouldflush = 1;
+        FlushPipeline(cpu);
         ClearException(cpu, ARM_Exception_Fast_Interrupt);
         return ARM_Exception_Fast_Interrupt;
     }
