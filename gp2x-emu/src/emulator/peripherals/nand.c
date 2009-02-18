@@ -24,19 +24,46 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef EMULATOR_H_INCLUDED
-#define EMULATOR_H_INCLUDED
-#include "cpu/cpu.h"
-#include "peripherals/memory.h"
-#include "disasm_arm.h"
-#include "disasm_thumb.h"
-#include "instrset_armv4.h"
-#include "instrset_thumb.h"
+#include "nand.h"
+#include "../assert.h"
 
-typedef struct ARM_Emulator
+int InitNAND(ARM_NAND* nand, const char* filepath)
 {
-    ARM_CPU cpu;
-    ARM_Memory memory;
-} ARM_Emulator;
+    if(!nand || !filepath){
+        ASSERT(!"nand or filepath pointers are NULL");    
+        return -1;
+    }
+    nand->isopen = 0;
+    nand->file = fopen(filepath, "rw");
+    
+    if(!nand->file){
+        ASSERT(!"nand->file is NULL after fopen");        
+        return -1;
+    }
+    nand->isopen = 1;
+    return 0;
+}
 
+/* Called by InitMemory in emulator/peripherals/memory.c */
+int OnInitNAND(ARM_NAND* nand, uint32_t* instr_boot)
+{
+    int wordsread;
+    if(!nand || !instr_boot){
+        ASSERT(!"nand or instr_boot pointers are NULL");
+        return -1;
+    }
+    wordsread = fread(instr_boot, sizeof(uint32_t), NAND_BOOT_LOAD_SIZE, nand->file);
+#if 0    
+    if(wordsread != NAND_BOOT_LOAD_SIZE){
+        ASSERT(!"Couldn't read the whole bootloader");
+        return -1;
+    }
 #endif
+    return 0;    
+}
+
+void DestroyNAND(ARM_NAND* nand)
+{
+    fclose(nand->file);
+    return;
+}
