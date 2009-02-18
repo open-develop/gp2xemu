@@ -6,7 +6,7 @@
 #include "emulator/cpu/cpu.h"
 #include "emulator/instrset_armv4.h"
 
-void PrintInstruction(int type, uint32_t address);
+void PrintInstruction(ARM_CPU* cpu, int type, uint32_t address);
 
 int main(int argc, const char* argv[])
 {
@@ -34,7 +34,7 @@ int main(int argc, const char* argv[])
 
     while(1)
     {
-#if 0
+#if 1
         scanf("%s", cmd);
         if(strcmp(cmd, "next") && strcmp(cmd, "n"))
             break;
@@ -46,7 +46,7 @@ int main(int argc, const char* argv[])
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
             exp = HandleException(&cpu); //undefined, interrupt, SWI, data abort, etc
-            PrintInstruction(type, *pc);
+            PrintInstruction(&cpu, type, *pc);
             if(exp == ARM_Exception_Unpredictable){
                 printf("Unpredictable behaviour at address %lu!\n",*pc);
                 break;
@@ -62,8 +62,9 @@ int main(int argc, const char* argv[])
     return 0;
 }
 
-void PrintInstruction(int type, uint32_t address)
+void PrintInstruction(ARM_CPU* cpu, int type, uint32_t address)
 {
+    int i,j, regid, mode;
     printf("%X ",address);
     switch(type)
     {
@@ -109,6 +110,22 @@ void PrintInstruction(int type, uint32_t address)
         case ARMV4_TypeSoftwareInterrupt:
             printf("SWI\n");
         break;
+    }
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    printf("Registers: \n");
+    for(j=0; j<4;++j){
+        for(i=0; i<4;++i){
+            regid = i+j*4;
+            if(regid < SP)
+                printf("r%d %d ",regid, *cpu->reg[mode][regid]);
+            else if(regid == SP)
+                printf("sp %d ", *cpu->reg[mode][regid]);
+            else if(regid == LR)
+                printf("lr %d ", *cpu->reg[mode][regid]);
+            else if(regid == PC)
+                printf("pc %d ", *cpu->reg[mode][regid]);
+        }
+        printf("\n");
     }
     return;
 }
