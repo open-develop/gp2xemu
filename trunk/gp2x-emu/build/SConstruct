@@ -1,0 +1,14 @@
+# SCons build file
+# TODO:
+# - Add support for Cygwin and gcc toolchains with prefixes
+
+env = Environment(platform = 'posix')
+Tool('cc')(env)
+
+target_name = 'gp2xemu'
+sources =  Split('main.c elf/elfheader.c elf/phdr.c elf/shdr.c')
+sources += Split('emulator/disasm_arm.c emulator/instrset_armv4.c')
+sources += Split('emulator/cpu/cpu.c emulator/peripherals/memory.c')
+env.MergeFlags('-O0 -DDEBUG -g')
+env.Program(target = target_name, source = sources, srcdir = '../src')
+
