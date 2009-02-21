@@ -31,7 +31,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "cpu/cpu.h"
 #include "peripherals/memory.h"
 
-/* 32-bit immediate */
+/*************************************************************************
+*************Addressing mode1, data processing operations*****************
+*************************************************************************/
+
 typedef struct ARMV4_Instr_DataProc_Immediate
 {
     uint32_t immed  : 8;
@@ -75,13 +78,14 @@ typedef struct ARMV4_Instr_DataProc_Register_Shift
     uint32_t cond   : 4;
 } ARMV4_Instr_DataProc_Register_Shift;
 
-typedef enum ARMV4_AddressMode1ShiftType
+typedef enum ARMV4_AddressModeShiftType
 {
     LSL = 0,
     LSR,
     ASR,
-    ROR
-} ARMV4_AddressMode1ShiftType;
+    ROR,
+    RRX
+} ARMV4_AddressModeShiftType;
 
 typedef struct ARMV4_Instr_Multiply
 {
@@ -98,6 +102,46 @@ typedef struct ARMV4_Instr_Multiply
     uint32_t cond   : 4;
 } ARMV4_Instr_Multiply;
 
+/***********************************************************************
+************ Addressing Mode 2 Load/Store unsigned byte/word ***********
+************************************************************************/
+
+typedef struct ARMV4_Instr_LoadStore_ImmediateOffset
+{
+    uint32_t offset12 : 12;
+    uint32_t Rd : 4;
+    uint32_t Rn : 4;
+    uint32_t L  : 1;
+    uint32_t W  : 1;
+    uint32_t B  : 1;
+    uint32_t U  : 1;
+    uint32_t P  : 1;
+    uint32_t opcode0 : 3;
+    uint32_t cond : 4;
+} ARMV4_Instr_LoadStore_ImmediateOffset;
+
+/* scaled, also register base and register offset is a special case
+    with shift (LSL) and shift_imm as zero*/
+typedef struct ARMV4_Instr_LoadStore_RegisterOffset
+{
+    uint32_t Rm : 4;
+    uint32_t SBZ : 1;
+    uint32_t shift : 2;
+    uint32_t shift_imm : 5;
+    uint32_t Rd : 4;
+    uint32_t Rn : 4;
+    uint32_t L  : 1;
+    uint32_t W  : 1;
+    uint32_t B  : 1;
+    uint32_t U  : 1;
+    uint32_t P  : 1;
+    uint32_t opcode0 : 3;
+    uint32_t cond : 4;
+} ARMV4_Instr_LoadStore_RegisterOffset;
+
+/**************************************************************************************** 
+*****Addressing Mode 3 Load/Store halfword, load signed byte, load/store doubleword *****
+******************************************************************************************/
 typedef struct ARMV4_Instr_LoadStore_Half_RegisterOffset
 {
         uint32_t Rm     : 4;
@@ -170,15 +214,27 @@ typedef struct ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset
 
 typedef union ARMV4_Instruction
 {
-    /* 'shift' is 00 = LSL, LSR, ASR, ROR */
+    /* 'shift' is LSL, LSR, ASR, ROR */
     ARMV4_Instr_DataProc_Immediate          dp_im;
     ARMV4_Instr_DataProc_Immed_Shift        dp_is;  /* also rrx (shift=0b11), and pure register operand (shift=0b00)*/
     ARMV4_Instr_DataProc_Register_Shift     dp_rs;
 
     ARMV4_Instr_Multiply                    mul;
+
+    ARMV4_Instr_LoadStore_ImmediateOffset   ls_io;
+    ARMV4_Instr_LoadStore_RegisterOffset    ls_ro;
     uint32_t word;
 } ARMV4_Instruction;
 
+typedef int (*instr_handler)(ARM_CPU*, ARM_Memory*, ARMV4_Instruction);
+
+/** Addressing modes **/
+void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* carry_out);
+void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* writeback);
+
 int CheckConditionFlag(ARM_CPU* cpu, int instr);
+
+/** Misc **/
 int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr, int type);
+
 #endif
