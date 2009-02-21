@@ -134,4 +134,4 @@ typedef enum ARMV4_InstructionType
  */
 int ARMV4_ParseInstruction(ARM_Word instr);
 
-#endif // DISASM_ARM_H_INCLUDED
+#endif /* DISASM_ARM_H_INCLUDED */

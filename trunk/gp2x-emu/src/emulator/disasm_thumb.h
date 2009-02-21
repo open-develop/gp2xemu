@@ -72,5 +72,5 @@ typedef union THUMB_Word
 
 int ARMV4_ParseThumb(THUMB_Word);
 
-#endif // DISASM_THUMB_H_INCLUDED
+#endif /* DISASM_THUMB_H_INCLUDED */
 
