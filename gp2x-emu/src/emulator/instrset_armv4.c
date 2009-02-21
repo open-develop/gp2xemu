@@ -93,7 +93,8 @@ int CheckConditionFlag(ARM_CPU* cpu, int instr)
         break;
         case ARM_CondNV:
             ASSERT(!"Cond flag NV 0xb1111 not supported on ARMv4!\n");
-            ret = 1;
+            ret = 0;
+            RaiseException(cpu, ARM_Exception_Unpredictable);
         break;
     }
     return ret;
@@ -246,10 +247,12 @@ static void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* val
     }
     else if( !(instr.word & (1<<25)) && (instr.word & (1<<4)) && !(instr.word & (1<<7))){
        /* Register shift with register */
-        ASSERT(instr.dp_rs.Rn != PC);
-        ASSERT(instr.dp_rs.Rd != PC);
-        ASSERT(instr.dp_rs.Rs != PC);
-        ASSERT(instr.dp_rs.Rm != PC);
+        if(instr.dp_rs.Rn == PC || instr.dp_rs.Rd == PC ||
+            instr.dp_rs.Rs == PC || instr.dp_rs.Rm == PC){
+            ASSERT(!"Illegal use of PC with addressing mode 1\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return;
+        }
 
         switch(instr.dp_rs.shift)
         {
@@ -355,6 +358,11 @@ static int handler_and(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
    
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
+
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
     
@@ -370,7 +378,12 @@ static int handler_and(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);        
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -396,7 +409,12 @@ static int handler_eor(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
-   
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
+
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
     
@@ -412,7 +430,12 @@ static int handler_eor(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -438,6 +461,11 @@ static int handler_sub(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -454,7 +482,12 @@ static int handler_sub(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -480,6 +513,11 @@ static int handler_rsb(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -496,7 +534,12 @@ static int handler_rsb(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -522,6 +565,11 @@ static int handler_add(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -538,7 +586,12 @@ static int handler_add(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -564,6 +617,11 @@ static int handler_adc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -580,7 +638,12 @@ static int handler_adc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode]; 
     }
@@ -604,9 +667,14 @@ static int handler_sbc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
-    
+
     GetStatusRegisterMode(cpu, CPSR, &mode);
-   
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
+
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
     
@@ -623,7 +691,12 @@ static int handler_sbc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -649,6 +722,11 @@ static int handler_rsc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -666,7 +744,12 @@ static int handler_rsc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -694,6 +777,11 @@ static int handler_tst(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     
@@ -723,6 +811,11 @@ static int handler_teq(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     
@@ -752,6 +845,11 @@ static int handler_cmp(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     
@@ -781,6 +879,11 @@ static int handler_cmn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     
@@ -810,6 +913,11 @@ static int handler_orr(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -826,7 +934,12 @@ static int handler_orr(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);        
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -852,6 +965,11 @@ static int handler_mov(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rd = instr.dp_im.Rd;
     
@@ -864,7 +982,12 @@ static int handler_mov(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);        
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -890,6 +1013,11 @@ static int handler_bic(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rn = instr.dp_im.Rn;
     Rd = instr.dp_im.Rd;
@@ -906,7 +1034,12 @@ static int handler_bic(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);        
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -932,6 +1065,11 @@ static int handler_mvn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     AddressingMode1(cpu, instr, (ARM_Word*)&shifter_operand, &shifter_carry);
     
     GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    /* check if addressing mode set an unpredictable flag */
+    if(GetException(cpu, ARM_Exception_Unpredictable)){
+        return 0;
+    }
    
     Rd = instr.dp_im.Rd;
     
@@ -944,7 +1082,12 @@ static int handler_mvn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
         FlushPipeline(cpu);
 
     if(instr.dp_im.S && Rd == PC){
-        ASSERT(mode != ARM_CPU_MODE_SYS && mode != ARM_CPU_MODE_USR);        
+        if(mode == ARM_CPU_MODE_SYS || mode == ARM_CPU_MODE_USR){
+            ASSERT(!"Unpredictable use of dataproc. \
+                S flag and PC used, but no SPSR\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return 0;
+        }
         cycles = 0;
         cpu->cpsr = cpu->spsr[mode];    
     }
@@ -958,6 +1101,341 @@ static int handler_mvn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 
     return cycles;
 }
+
+/*
+typedef struct ARMV4_Instr_Multiply
+{
+    uint32_t Rm     : 4;
+    uint32_t opcode1: 4;
+    uint32_t Rs     : 4;
+    uint32_t Rn     : 4;
+    uint32_t Rd     : 4;
+    uint32_t S      : 1;
+    uint32_t A      : 1;
+    uint32_t U      : 1;
+    uint32_t islong : 1;
+    uint32_t opcode0: 4;
+    uint32_t cond   : 4;
+} ARMV4_Instr_Multiply;
+
+*/
+
+/* NOTE: The carry flag is really unpredictable on ARMv4 and earlier.
+        We leave carry unaffected now instead of tracking carry reads
+        after multiplications, unless someone has a strong argument against this.
+        PC/r15 is not allowed for any operands for any of the multiplication
+        instructions. Rd, RdHi, RdLo and Rm *must* be seperate registers.
+*/
+
+static int handler_mul(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rs, *RdPtr, RmVal, RsVal;
+    int cycles, mode;
+
+    cycles = 0;
+    
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0; /* no-op */
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd and Rm must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr = cpu->reg[mode][Rd];
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+    
+    *RdPtr = RmVal * RsVal;
+    
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RdPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr);
+        /* regarding C and V, see note above */
+    }
+
+    return cycles;
+}
+
+static int handler_mla(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rs, Rn, *RdPtr, RmVal, RsVal, RnVal;
+    int cycles, mode;
+
+    cycles = 0;
+
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0; /* no-op */
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+   
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+    Rn = instr.mul.Rn;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC|| Rn == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd and Rm must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr = cpu->reg[mode][Rd];
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+    RnVal = *cpu->reg[mode][Rn];
+
+    *RdPtr = RmVal * RsVal + RnVal;
+
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RdPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr);
+        /* regarding C and V, see note above */
+    }
+
+    return cycles;
+}
+
+static int handler_smull(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rn, Rs, *RdPtr, *RnPtr, RmVal, RsVal;
+    int64_t result64;    
+    int cycles, mode;
+
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0;
+
+    cycles = 0;
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+   
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+    Rn = instr.mul.Rn;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC|| Rn == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm || Rd == Rn || Rm == Rn){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd, Rm and Rn must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr =  cpu->reg[mode][Rd]; /* low */
+    RnPtr =  cpu->reg[mode][Rn]; /* high */
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+
+    result64 = (int64_t)RmVal * (int64_t)RsVal;
+    *RdPtr = (uint64_t)result64 & 0xFFFFFFFF;
+    *RnPtr = (uint64_t)result64 >> 32ULL;
+
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RnPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr || *RnPtr);
+    }
+    
+    return cycles;
+}
+
+static int handler_smlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rn, Rs, *RdPtr, *RnPtr, RmVal, RsVal;
+    int64_t result64;
+    uint64_t accum64;
+    int cycles, mode;
+
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0;
+
+    cycles = 0;
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+   
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+    Rn = instr.mul.Rn;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC|| Rn == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm || Rd == Rn || Rm == Rn){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd, Rm and Rn must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr =  cpu->reg[mode][Rd]; /* low */
+    RnPtr =  cpu->reg[mode][Rn]; /* high */
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+
+    accum64 = ((uint64_t)*RnPtr << 32ULL) | *RdPtr;
+    result64 = (int64_t)RmVal * (int64_t)RsVal + (int64_t)accum64;
+    *RdPtr = (uint64_t)result64 & ~0xFFFFFFFF;
+    *RnPtr = (uint64_t)result64 >> 32ULL;
+
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RnPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr || *RnPtr);
+    }
+    
+    return cycles;
+}
+
+static int handler_umull(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rn, Rs, *RdPtr, *RnPtr, RmVal, RsVal;
+    uint64_t result64;    
+    int cycles, mode;
+
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0;
+
+    cycles = 0;
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+   
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+    Rn = instr.mul.Rn;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC|| Rn == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm || Rd == Rn || Rm == Rn){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd, Rm and Rn must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr =  cpu->reg[mode][Rd]; /* low */
+    RnPtr =  cpu->reg[mode][Rn]; /* high */
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+
+    result64 = (uint64_t)RmVal * RsVal;
+    *RdPtr = result64 & 0xFFFFFFFF;
+    *RnPtr = result64 >> 32ULL;
+
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RnPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr || *RnPtr);
+    }
+    
+    return cycles;
+}
+
+static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t Rd, Rm, Rn, Rs, *RdPtr, *RnPtr, RmVal, RsVal;
+    uint64_t result64, accum64;
+    int cycles, mode;
+
+    if( !CheckConditionFlag(cpu, instr.mul.cond) )
+        return 0;
+
+    cycles = 0;
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+   
+    Rd = instr.mul.Rd;
+    Rm = instr.mul.Rm;
+    Rs = instr.mul.Rs;
+    Rn = instr.mul.Rn;
+
+    /* PC branching not allowed */
+    if(Rd == PC || Rm == PC || Rs == PC|| Rn == PC){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                PC is not allowed\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    /* Operand restrictions */
+    if(Rd == Rm || Rd == Rn || Rm == Rn){
+        ASSERT(!"Unpredictable use of multiplication.\n \
+                Rd, Rm and Rn must differ.\n");
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        return 0;
+    }
+
+    RdPtr =  cpu->reg[mode][Rd]; /* low */
+    RnPtr =  cpu->reg[mode][Rn]; /* high */
+    RmVal = *cpu->reg[mode][Rm];
+    RsVal = *cpu->reg[mode][Rs];
+
+    accum64 = ((uint64_t)*RnPtr << 32ULL) | *RdPtr;
+    result64 = (uint64_t)RmVal * RsVal + accum64;
+    *RdPtr = result64 & 0xFFFFFFFF;
+    *RnPtr = result64 >> 32ULL;
+
+    if(instr.mul.S){
+        cpu->cpsr.f.N = (signed)*RnPtr < 0;
+        cpu->cpsr.f.Z = !(*RdPtr || *RnPtr);
+    }
+    
+    return cycles;
+}
+
+static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+return 0;
+}
+
+
 
 int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr, int type)
 {
@@ -983,6 +1461,14 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         handler_bic /* S = 0 */, handler_bic, /* S=1 */
         handler_mvn /* S = 0 */, handler_mvn /* S=1 */
     };
+
+    const instr_handler mulptr[8] = {
+        handler_mul,    NULL,
+        handler_mla,    NULL,
+        handler_smull, handler_umull,
+        handler_smlal, handler_umlal
+    };
+
     int index;
 
     switch(type)
@@ -990,13 +1476,18 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         case ARMV4_TypeUndefined:
             return 0;
         case ARMV4_TypeUnpredictable:
-            return -1;
+            return 0;
         case ARMV4_TypeDataProcessing:
             index = (instr.dp_is.opcode1<<1) | instr.dp_is.S;
             return datapr[index](cpu, mem, instr);
+        case ARMV4_TypeMultiplication:
+            index = (instr.mul.islong << 2) | (instr.mul.A << 1) | instr.mul.U;
+            return mulptr[index](cpu, mem, instr);
         default:
             ASSERT(!"Instruction not yet implemented.\n");
     }
 
     return 0;
 }
+
+

@@ -71,10 +71,10 @@ int main(int argc, const char* argv[])
             instr_arm = FetchInstruction32(&cpu, &mem);
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
-            exp = HandleException(&cpu); //undefined, interrupt, SWI, data abort, etc
+            exp = HandleException(&cpu); /*undefined, interrupt, SWI, data abort, etc */
             PrintInstruction(&cpu, type, *pc);
             if(exp == ARM_Exception_Unpredictable){
-                printf("Unpredictable behaviour at address %lu!\n",*pc);
+                printf("Unpredictable behaviour at address %u!\n",*pc);
                 break;
             }
             if(!cpu.shouldflush)

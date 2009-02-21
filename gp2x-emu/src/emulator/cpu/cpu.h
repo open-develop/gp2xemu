@@ -116,6 +116,7 @@ void GetStatusRegisterMode(ARM_CPU* cpu, int which, int* result);
 uint32_t* GetProgramCounter(ARM_CPU* cpu);
 void RaiseException(ARM_CPU* cpu, ARM_Exception which);
 void ClearException(ARM_CPU* cpu, ARM_Exception which);
+int GetException(ARM_CPU* cpu, ARM_Exception which);
 ARM_Exception HandleException(ARM_CPU* cpu);
 void FlushPipeline(ARM_CPU* cpu);
-#endif // CPU_H_INCLUDED
+#endif /* CPU_H_INCLUDED */

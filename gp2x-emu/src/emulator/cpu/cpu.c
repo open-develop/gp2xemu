@@ -38,7 +38,7 @@ static void ResetPSR(ARM_CPU* cpu)
         This must always be done when assigning the PSR mode flag.
     */
 
-    ASSERT( cpu != NULL );
+    ASSERT(cpu);
 
     memset(&cpu->spsr, 0, sizeof(ARM_StatusRegister) * 16);
     memset(&cpu->cpsr, 0, sizeof(ARM_StatusRegister));
@@ -60,7 +60,7 @@ static void ResetRegisters(ARM_CPU* cpu)
     /* initialize the pointer indirection required by the register banking */
     int i;
 
-    ASSERT( cpu != NULL );
+    ASSERT(cpu);
 
     for(i=0;i<16;++i)
         memset(&cpu->reg[i], 0, sizeof(uint32_t*) * 16);
@@ -124,7 +124,7 @@ static void ResetRegisters(ARM_CPU* cpu)
 
 void ResetCPU(ARM_CPU* cpu)
 {
-    ASSERT( cpu != NULL );
+    ASSERT(cpu);
     ResetRegisters(cpu);
     ResetPSR(cpu);
     cpu->exception = ARM_Exception_None;
@@ -157,7 +157,7 @@ uint32_t* GetProgramCounter(ARM_CPU* cpu)
 {
     int mode;
 
-    ASSERT( cpu != NULL );
+    ASSERT(cpu);
     if(!cpu)
         return NULL;
     return (cpu->reg[0][PC]);
@@ -165,14 +165,25 @@ uint32_t* GetProgramCounter(ARM_CPU* cpu)
 
 void RaiseException(ARM_CPU* cpu, ARM_Exception which)
 {
+    ASSERT(cpu);
     cpu->exception |= which;
     return;
 }
 
 void ClearException(ARM_CPU* cpu, ARM_Exception which)
 {
+    ASSERT(cpu);
     cpu->exception &= ~which;
     return;
+}
+
+/* 1 on exception. Does this make sense? Other functions return -1 on "error" */
+int GetException(ARM_CPU* cpu, ARM_Exception which)
+{
+    ASSERT(cpu);
+    if(cpu->exception & which)
+        return 1;
+    return 0;
 }
 
 ARM_Exception HandleException(ARM_CPU* cpu)
