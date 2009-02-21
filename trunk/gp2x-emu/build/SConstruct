@@ -9,7 +9,7 @@ target_name = 'gp2xemu'
 sources =  Split('main.c elf/elfheader.c elf/phdr.c elf/shdr.c')
 sources += Split('emulator/disasm_arm.c emulator/instrset_armv4.c')
 sources += Split('emulator/cpu/cpu.c emulator/peripherals/memory.c')
-sources += Split('emulator/peripherals/nand.c')
+sources += Split('emulator/peripherals/nand.c emulator/addrmode_arm.c')
 env.MergeFlags('-std=c99 -pedantic -W -Wall -Wextra -Wno-unused -O0 -DDEBUG -g')
 env.Program(target = target_name, source = sources, srcdir = '../src')
 
