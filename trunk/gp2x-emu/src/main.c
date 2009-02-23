@@ -68,7 +68,7 @@ int main(int argc, const char* argv[])
 #endif
         if(!cpu.cpubusywait){
             pc = GetProgramCounter(&cpu);
-            instr_arm = FetchInstruction32(&cpu, &mem);
+            instr_arm = ReadInstruction32(&cpu, &mem);
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
             exp = HandleException(&cpu); /*undefined, interrupt, SWI, data abort, etc */

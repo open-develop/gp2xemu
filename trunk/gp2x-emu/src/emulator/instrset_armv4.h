@@ -139,6 +139,13 @@ typedef struct ARMV4_Instr_LoadStore_RegisterOffset
     uint32_t cond : 4;
 } ARMV4_Instr_LoadStore_RegisterOffset;
 
+typedef enum ARMV4_LoadStoreMode
+{
+    ARM_LoadStore_PostIndexed = 0,
+    ARM_LoadStore_PostIndexed_T = 1,
+    ARM_LoadStore_Offset = 2,
+    ARM_LoadStore_PreIndexed = 3
+} ARMV4_LoadStoreMode;
 /**************************************************************************************** 
 *****Addressing Mode 3 Load/Store halfword, load signed byte, load/store doubleword *****
 ******************************************************************************************/
@@ -230,7 +237,7 @@ typedef int (*instr_handler)(ARM_CPU*, ARM_Memory*, ARMV4_Instruction);
 
 /** Addressing modes **/
 void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* carry_out);
-void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* writeback);
+void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index);
 
 int CheckConditionFlag(ARM_CPU* cpu, int instr);
 

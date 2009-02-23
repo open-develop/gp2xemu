@@ -353,41 +353,83 @@ if(instr.ls_io.U)
 
     == Cheat-sheet ==
     With opcode0 == 2 ( immediate offset / index):
-    P = 0 && W = 0 NOT ALLOWED (see note about T-mode above)
-    P = 1 && W = 0 immediate offset
-    P = 1 && W = 1 immediate pre-indexed
-    P = 0 && W = 0 immediate post-indexed
+    P = 0 && W = 0 immediate post-indexed without translation
+    P = 0 && W = 1 immediate post-indexed with translation (T mode)
+    P = 1 && W = 0 immediate offset (no writeback)
+    P = 1 && W = 1 immediate pre-indexed (with writeback)
+
+IPUBWL
 */
 
-void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* writeback)
+void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
 {
-    uint32_t Rn, Rm;
-    uint32_t** reg;
+    uint32_t Rm, RmVal;
     int mode;
 
-    ASSERT(writeback);
-    *writeback = 0;
+    ASSERT(index);
+
+    *index = 0;
     GetStatusRegisterMode(cpu, CPSR, &mode);
-    /* just a handy pointer to access the register file */
-    reg = &cpu->reg[mode][0];
     
     if(instr.ls_io.opcode0 == 0x2){
-        /* immediate offset or just a register base*/
-        Rn = instr.ls_io.Rn;
-        if(instr.ls_io.P == 1){
-            if(instr.ls_io.W == 0){
-                
-            }
-        }
+        /* immediate, so just pass it on*/
+        *index = instr.ls_io.offset12;
+
     }
     else if(instr.ls_io.opcode0 == 0x3){
         /* Register offset (scaled) with shifts */
+        Rm = instr.ls_ro.Rm;
+        if(Rm == PC){
+            ASSERT(!"Illegal use of PC with addressing mode 2\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return;
+        }
+
+        RmVal = *cpu->reg[mode][Rm];
+        
+        switch(instr.ls_ro.shift)
+        {
+            case LSL:
+                if(!instr.ls_ro.shift_imm){
+                    /* Register offset, i.e just the Rm */
+                    *index = RmVal;
+                    break;
+                }
+                *index = RmVal << instr.ls_ro.shift_imm;
+            break;
+
+            case LSR:
+                if(!instr.ls_ro.shift_imm)
+                    *index = RmVal >> 32UL;
+                else
+                    *index = RmVal >> instr.ls_ro.shift_imm;
+            break;
+
+            case ASR:
+                if(!instr.ls_ro.shift_imm){
+                    if(RmVal & (1<<31UL))
+                        *index = 0xFFFFFFFF;
+                    else
+                        *index = 0;
+                    break;
+                }
+                *index = (int32_t)RmVal >> instr.ls_ro.shift_imm;
+            break;
+
+            case ROR:
+                if(!instr.ls_ro.shift_imm){
+                    /* RRX Rotate Right with extend */
+                    *index = (cpu->cpsr.f.C << 31UL) | (RmVal << 1UL);
+                    break;
+                }
+                *index = (RmVal >> instr.ls_ro.shift_imm) | (RmVal << (32UL - instr.ls_ro.shift_imm));
+            break;
+        }
     }
     else {
         ASSERT(!"Illegal instruction for addressing mode 2!\n \
-            27 should be zero.\n");
-        /* Unsure about this one. Would this state be a flaw with the logic? */
-        RaiseException(cpu, ARM_Exception_Unpredictable);
+            bit 27 should be zero.\n");
     }
     return;
 }
+
