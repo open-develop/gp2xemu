@@ -1119,9 +1119,99 @@ static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     return cycles;
 }
 
+
+/*
+    Remember to follow the ARM9 base restored Data Abort model here!
+    This is documented in ARMARM revision A, page A2-18, as well as in
+    the ARM9TDMI specification (ARM920T or ARM940T)
+*/
+
+static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
+    uint32_t address, uint32_t* Rd, int L, int B)
+{
+    if(L){
+        if(B)
+            *Rd = ReadMemory8(cpu, mem, address);
+        else
+            *Rd = ReadMemory32(cpu, mem, address);
+    }
+    else {
+        if(B)
+            WriteMemory8(cpu, mem, address, *Rd);
+        else
+            WriteMemory32(cpu, mem, address, *Rd);
+    }
+    return;
+}
+
 static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
-return 0;
+    int type;
+    int cond;
+    int cycles;
+    int mode;
+    int B, L;
+    
+    uint32_t *dest, *base, index, Rd, Rn;
+
+    cycles = 0;    
+    type = (instr.ls_io.P<<1)|instr.ls_io.W;
+    cond = CheckConditionFlag(cpu, instr.ls_io.cond);
+
+    /*  ARM_LoadStore_Offset = 0x2 = (P=1 && W=0), which means no writeback.
+        With no writeback, the condition works on the instruction as a whole.
+        With writeback, the condition affects the writeback only.
+    */
+    if(type == ARM_LoadStore_Offset && !cond)
+        return cycles;
+
+    AddressingMode2(cpu, instr, &index);
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    B = instr.ls_io.B;
+    L = instr.ls_io.L;
+    Rn = instr.ls_io.Rn;
+    Rd = instr.ls_io.Rd;
+    base = cpu->reg[mode][Rn];
+    dest = cpu->reg[mode][Rd]; /* destination for LDR, source for STR */
+
+    switch(type)
+    {
+        case ARM_LoadStore_PostIndexed:
+            loadstore_accessmemory(cpu, mem, *base, dest, L, B);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break; /* Restored data abort model. Don't do writebacks */
+            if(cond)            
+                *base += instr.ls_io.U ? index : -index;
+        break;
+
+        case ARM_LoadStore_PostIndexed_T:
+            /*  Temprarily changed CPSR here, to perform STRT, STRBT, LDRT or
+                LDRBT in user mode */
+            cpu->cpsr.f.mode = ((1U<<5U) | ARM_CPU_MODE_USR);
+            loadstore_accessmemory(cpu, mem, *base, dest, L, B);
+            cpu->cpsr.f.mode = ((1U<<5U) | mode);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break; /* Restored data abort model. Don't do writebacks */
+            if(cond) /* condition code controls the writeback */
+                *base += instr.ls_io.U ? index : -index;
+        break;
+
+        case ARM_LoadStore_Offset:
+            loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+            /* no exception checking here, as offsets don't do writebacks */
+        break;
+
+        case ARM_LoadStore_PreIndexed:
+        loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break; /* Restored data abort model. Don't do writebacks */
+            if(cond)
+                *base += instr.ls_io.U ? index : -index;
+        break;
+    }
+
+    return cycles;
 }
 
 

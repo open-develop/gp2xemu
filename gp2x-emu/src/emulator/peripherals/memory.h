@@ -50,11 +50,15 @@ int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len);
 void DestroyMemory(ARM_Memory* mem);
 void ReInitializeMemory(ARM_Memory* mem);
 
-uint32_t FetchInstruction32(ARM_CPU* cpu, const ARM_Memory* mem);
-uint16_t FetchInstruction16(ARM_CPU* cpu, const ARM_Memory* mem);
+uint32_t ReadInstruction32(ARM_CPU* cpu, const ARM_Memory* mem);
+uint16_t ReadInstruction16(ARM_CPU* cpu, const ARM_Memory* mem);
 
-uint32_t FetchMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
-uint16_t FetchMemory16(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
-uint8_t   FetchMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
+uint32_t ReadMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
+uint16_t ReadMemory16(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
+uint8_t  ReadMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address);
+
+void WriteMemory32(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint32_t value);
+void WriteMemory16(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint16_t value);
+void WriteMemory8 (ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint8_t  value);
 #endif
 

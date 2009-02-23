@@ -69,7 +69,7 @@ void ReInitializeMemory(ARM_Memory* mem)
 }
 
 /* TODO: Check memory access regions, writeback and cache here */
-uint32_t FetchInstruction32(ARM_CPU* cpu, const ARM_Memory* mem)
+uint32_t ReadInstruction32(ARM_CPU* cpu, const ARM_Memory* mem)
 {
     const void* src;
     uint32_t pc;
@@ -84,7 +84,7 @@ uint32_t FetchInstruction32(ARM_CPU* cpu, const ARM_Memory* mem)
     return ((const uint32_t*)src)[pc>>2];
 }
 
-uint16_t FetchInstruction16(ARM_CPU* cpu, const ARM_Memory* mem)
+uint16_t ReadInstruction16(ARM_CPU* cpu, const ARM_Memory* mem)
 {
     const void* src;
     uint32_t pc;
@@ -99,7 +99,7 @@ uint16_t FetchInstruction16(ARM_CPU* cpu, const ARM_Memory* mem)
     return ((const uint16_t*)src)[pc>>1];
 }
 
-uint32_t FetchMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
+uint32_t ReadMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
 {
     const void* src = mem->mem;
     address &= ~0x3;
@@ -110,7 +110,7 @@ uint32_t FetchMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
     return ((const uint32_t*)src)[address>>2];
 }
 
-uint16_t FetchMemory16(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
+uint16_t ReadMemory16(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
 {
     const void* src = mem->mem;
     address &= ~0x1;
@@ -121,7 +121,7 @@ uint16_t FetchMemory16(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
     return ((const uint16_t*)mem)[address>>1];
 }
 
-uint8_t FetchMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
+uint8_t ReadMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
 {
     const void* src = mem->mem;
     if(address >= mem->length){
@@ -131,3 +131,17 @@ uint8_t FetchMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
     return ((const uint8_t*)mem)[address];
 }
 
+void WriteMemory32(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint32_t value)
+{
+
+}
+
+void WriteMemory16(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint16_t value)
+{
+
+}
+
+void WriteMemory8 (ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint8_t value)
+{
+
+}
