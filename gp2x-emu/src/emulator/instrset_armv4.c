@@ -1125,7 +1125,7 @@ static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     This is documented in ARMARM revision A, page A2-18, as well as in
     the ARM9TDMI specification (ARM920T or ARM940T)
 */
-
+/* LDR, STR, LDRT, STRT, LDRB, STRB, LDRBT, STRBT */
 static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
     uint32_t address, uint32_t* Rd, int L, int B)
 {
@@ -1181,8 +1181,11 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             loadstore_accessmemory(cpu, mem, *base, dest, L, B);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
-            if(cond)            
-                *base += instr.ls_io.U ? index : -index;
+            if(cond)
+                if(U)            
+                    *base += index;
+                else
+                    *base -= index;
         break;
 
         case ARM_LoadStore_PostIndexed_T:
@@ -1194,7 +1197,10 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
             if(cond) /* condition code controls the writeback */
-                *base += instr.ls_io.U ? index : -index;
+                if(U)            
+                    *base += index;
+                else
+                    *base -= index;
         break;
 
         case ARM_LoadStore_Offset:
@@ -1207,7 +1213,10 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
             if(cond)
-                *base += instr.ls_io.U ? index : -index;
+                if(U)            
+                    *base += index;
+                else
+                    *base -= index;
         break;
     }
 
@@ -1262,6 +1271,8 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         case ARMV4_TypeMultiplication:
             index = (instr.mul.islong << 2) | (instr.mul.A << 1) | instr.mul.U;
             return mulptr[index](cpu, mem, instr);
+        case ARMV4_TypeLoadStoreSingle:
+            return handler_loadstore(cpu, mem, instr);
         default:
             ASSERT(!"Instruction not yet implemented.\n");
     }

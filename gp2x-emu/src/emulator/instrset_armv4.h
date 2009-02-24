@@ -146,6 +146,7 @@ typedef enum ARMV4_LoadStoreMode
     ARM_LoadStore_Offset = 2,
     ARM_LoadStore_PreIndexed = 3
 } ARMV4_LoadStoreMode;
+
 /**************************************************************************************** 
 *****Addressing Mode 3 Load/Store halfword, load signed byte, load/store doubleword *****
 ******************************************************************************************/
@@ -222,17 +223,24 @@ typedef struct ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset
 typedef union ARMV4_Instruction
 {
     /* 'shift' is LSL, LSR, ASR, ROR */
-    ARMV4_Instr_DataProc_Immediate          dp_im;
-    ARMV4_Instr_DataProc_Immed_Shift        dp_is;  /* also rrx (shift=0b11), and pure register operand (shift=0b00)*/
-    ARMV4_Instr_DataProc_Register_Shift     dp_rs;
+    ARMV4_Instr_DataProc_Immediate                      dp_im;
+    ARMV4_Instr_DataProc_Immed_Shift                    dp_is;
+    ARMV4_Instr_DataProc_Register_Shift                 dp_rs;
 
-    ARMV4_Instr_Multiply                    mul;
+    ARMV4_Instr_Multiply                                mul;
 
-    ARMV4_Instr_LoadStore_ImmediateOffset   ls_io;
-    ARMV4_Instr_LoadStore_RegisterOffset    ls_ro;
+    ARMV4_Instr_LoadStore_ImmediateOffset               ls_io;
+    ARMV4_Instr_LoadStore_RegisterOffset                ls_ro;
+
+    ARMV4_Instr_LoadStore_Half_ImmediateOffset          lsh_io;
+    ARMV4_Instr_LoadStore_Half_RegisterOffset           lsh_ro;
+    ARMV4_Instr_LoadStore_Signed_Half_RegisterOffset    lsh_sro;
+    ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset   lsh_sio;
+
     uint32_t word;
 } ARMV4_Instruction;
 
+/* function pointer type for instruction handlers */
 typedef int (*instr_handler)(ARM_CPU*, ARM_Memory*, ARMV4_Instruction);
 
 /** Addressing modes **/

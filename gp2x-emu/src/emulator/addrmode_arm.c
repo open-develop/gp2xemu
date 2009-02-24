@@ -339,14 +339,9 @@ void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int
     }
     return;
 }
-/*
-if(instr.ls_io.U)
-            *value = (*reg)[Rn] + instr.ls_io.offset12;
-        else
-            *value = (*reg)[Rn] - instr.ls_io.offset12;
-*/
 
-/*  Addressing mode 2 for Load and Store word or byte.
+/*
+    Addressing mode 2 for Load and Store word or unsigned byte.
     Refer to ARM Architecture Reference Manual page A5-18, revision A
     TODO: Implement the T-versions (P==0, W==1). This mode does user-priviledged
     lookups and needs the MMU/MPU interface.
@@ -357,8 +352,6 @@ if(instr.ls_io.U)
     P = 0 && W = 1 immediate post-indexed with translation (T mode)
     P = 1 && W = 0 immediate offset (no writeback)
     P = 1 && W = 1 immediate pre-indexed (with writeback)
-
-IPUBWL
 */
 
 void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
@@ -369,7 +362,6 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
     ASSERT(index);
 
     *index = 0;
-    GetStatusRegisterMode(cpu, CPSR, &mode);
     
     if(instr.ls_io.opcode0 == 0x2){
         /* immediate, so just pass it on*/
@@ -384,7 +376,8 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
             RaiseException(cpu, ARM_Exception_Unpredictable);
             return;
         }
-
+        
+        GetStatusRegisterMode(cpu, CPSR, &mode);
         RmVal = *cpu->reg[mode][Rm];
         
         switch(instr.ls_ro.shift)
@@ -400,7 +393,7 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
 
             case LSR:
                 if(!instr.ls_ro.shift_imm)
-                    *index = RmVal >> 32UL;
+                    *index = RmVal = 0;
                 else
                     *index = RmVal >> instr.ls_ro.shift_imm;
             break;
@@ -419,16 +412,12 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
             case ROR:
                 if(!instr.ls_ro.shift_imm){
                     /* RRX Rotate Right with extend */
-                    *index = (cpu->cpsr.f.C << 31UL) | (RmVal << 1UL);
+                    *index = (cpu->cpsr.f.C << 31UL) | (RmVal >> 1UL);
                     break;
                 }
                 *index = (RmVal >> instr.ls_ro.shift_imm) | (RmVal << (32UL - instr.ls_ro.shift_imm));
             break;
         }
-    }
-    else {
-        ASSERT(!"Illegal instruction for addressing mode 2!\n \
-            bit 27 should be zero.\n");
     }
     return;
 }
