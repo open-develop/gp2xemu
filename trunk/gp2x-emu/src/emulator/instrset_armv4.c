@@ -1150,7 +1150,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
     int cond;
     int cycles;
     int mode;
-    int B, L;
+    int B, L, U;
     
     uint32_t *dest, *base, index, Rd, Rn;
 
@@ -1166,10 +1166,15 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         return cycles;
 
     AddressingMode2(cpu, instr, &index);
+
+    if(GetException(cpu, ARM_Exception_Unpredictable))
+        return 0;
+    
     GetStatusRegisterMode(cpu, CPSR, &mode);
 
     B = instr.ls_io.B;
     L = instr.ls_io.L;
+    U = instr.ls_io.U;
     Rn = instr.ls_io.Rn;
     Rd = instr.ls_io.Rd;
     base = cpu->reg[mode][Rn];
@@ -1204,25 +1209,146 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         break;
 
         case ARM_LoadStore_Offset:
-            loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+            if(U)
+                loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+            else
+                loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
             /* no exception checking here, as offsets don't do writebacks */
         break;
 
         case ARM_LoadStore_PreIndexed:
-        loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+        if(U){
+            loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
             if(cond)
-                if(U)            
-                    *base += index;
-                else
-                    *base -= index;
+                *base += index;
+        }
+        else {
+            loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break; /* Restored data abort model. Don't do writebacks */
+            if(cond)
+                *base -= index;
+        }
         break;
     }
 
     return cycles;
 }
 
+static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
+    uint32_t address, uint32_t* Rd, int L, int H, int S)
+{
+    if(L){
+        if(H){ /* halfword */
+            *Rd = ReadMemory16(cpu, mem, address);
+            if(S && (*Rd & (1UL<<15UL))){ /* sign extend signed words */
+                *Rd |= 0xFFFF0000;
+            }
+        }
+        else { /* byte with this instruction are always signed extended */
+            *Rd = ReadMemory8(cpu, mem, address);
+            /* sign extend here */
+            if(*Rd & (1UL<<15UL)){ /* sign extend signed words */
+                *Rd |= 0xFFFFFF00;
+            }
+        }
+    }
+    else {
+        /*  
+            Encodings for store signed byte/halfword and
+            unsigned byte are a part of the unused instruction extension space,
+            and is undefined. ARM uses STRB or STRH instead, since storing 
+            doesn't require sign extending. The ARMV4_ParseInstrucion should already
+            have caught this, hence the assert below.
+        */
+        ASSERT(!S && !B);
+        WriteMemory16(cpu, mem, address, *Rd); /* unsigned halfword only */
+    }
+    return;
+}
+
+/* LDRS, LDRSH, LDRSB and STRH */
+int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    int type;
+    int cond;
+    int cycles;
+    int mode;
+    int H, L, U, S;
+    
+    uint32_t *dest, *base, index, Rd, Rn;
+
+    cycles = 0;
+    type = (instr.lsh_io.P<<1)|instr.lsh_io.W;
+    cond = CheckConditionFlag(cpu, instr.lsh_io.cond);
+
+    /*  ARM_LoadStore_Offset = 0x2 = (P=1 && W=0), which means no writeback.
+        With no writeback, the condition works on the instruction as a whole.
+        With writeback, the condition affects the writeback only.
+    */
+    if(type == ARM_LoadStore_Offset && !cond)
+        return cycles;
+
+    AddressingMode3(cpu, instr, &index);
+
+    if(GetException(cpu, ARM_Exception_Unpredictable))
+        return 0;
+
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+
+    H = instr.ls_io.H;
+    L = instr.ls_io.L;
+    U = instr.ls_io.U;
+    S = instr.ls_io.S;
+    Rn = instr.ls_io.Rn;
+    Rd = instr.ls_io.Rd;
+    base = cpu->reg[mode][Rn];
+    dest = cpu->reg[mode][Rd]; /* destination for LDR, source for STR */
+
+    switch(type)
+    {
+    ARM_LoadStore_PostIndexed:
+        loadstore_accessmemory(cpu, mem, *base, dest, L, H, S);
+        if(GetException(cpu, ARM_Exception_Data_Abort))
+            break;
+        if(cond)
+            if(U)
+                *base += index;
+            else
+                *base -= index;
+        break;
+    ARM_LoadStore_PostIndexed_T:
+        /* Address Mode 3 does not have a translation mode (P=0 && W=1) */
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        ASSERT(!"Addressing mode 3 has no translation support!\n");
+        break;
+    ARM_LoadStore_Offset:
+        if(U)
+            loadstore_accessmemory(cpu, mem, *base + index, dest, L, H, S);
+        else
+            loadstore_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+        break;
+    ARM_LoadStore_PreIndexed:
+        if(U){
+            loadstore_accessmemory(cpu, mem, *base + index, dest, L, H, S);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break;
+            if(cond)
+                *base += index;
+        }
+        else {
+            loadstore_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break;
+            if(cond)
+                *base -= index;
+        }
+        break;
+    }
+    return cycles;
+}
 
 
 int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr, int type)
@@ -1273,6 +1399,8 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             return mulptr[index](cpu, mem, instr);
         case ARMV4_TypeLoadStoreSingle:
             return handler_loadstore(cpu, mem, instr);
+        case ARMV4_TypeLoadStoreExtra:
+            return handler_loadstoreextra(cpu, mem, instr);
         default:
             ASSERT(!"Instruction not yet implemented.\n");
     }

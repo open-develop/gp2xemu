@@ -159,7 +159,7 @@ typedef struct ARMV4_Instr_LoadStore_Half_RegisterOffset
         uint32_t Rn     : 4;
         uint32_t L      : 1;
         uint32_t W      : 1;
-        uint32_t B      : 1; /* Must be zero*/
+        uint32_t B      : 1; /* differs between register and immediate */
         uint32_t U      : 1;
         uint32_t P      : 1;
         uint32_t opcode0: 3;
@@ -175,49 +175,12 @@ typedef struct ARMV4_Instr_LoadStore_Half_ImmediateOffset
         uint32_t Rn     : 4;
         uint32_t L      : 1;
         uint32_t W      : 1;
-        uint32_t B      : 1; /* Must be one*/
+        uint32_t B      : 1;    /* differs between register and immediate */
         uint32_t U      : 1;
         uint32_t P      : 1;
         uint32_t opcode0: 3;
         uint32_t cond   : 4;
 } ARMV4_Instr_LoadStore_Half_ImmediateOffset;
-
-
-typedef struct ARMV4_Instr_LoadStore_Signed_Half_RegisterOffset
-{
-        uint32_t Rm     : 4;
-        uint32_t opcode2: 1;
-        uint32_t H      : 1;
-        uint32_t opcode1: 2;
-        uint32_t SBZ    : 4;
-        uint32_t Rd     : 4;
-        uint32_t Rn     : 4;
-        uint32_t L      : 1; /* Must be one. Load only */
-        uint32_t W      : 1;
-        uint32_t B      : 1; /* Must be zero */
-        uint32_t U      : 1;
-        uint32_t P      : 1;
-        uint32_t opcode0: 3;
-        uint32_t cond   : 4;
-} ARMV4_Instr_LoadStore_Signed_Half_RegisterOffset;
-
-typedef struct ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset
-{
-        uint32_t LoOff  : 4;
-        uint32_t opcode2: 1;
-        uint32_t H      : 1;
-        uint32_t opcode1: 2;
-        uint32_t HiOff  : 4;
-        uint32_t Rd     : 4;
-        uint32_t Rn     : 4;
-        uint32_t L      : 1; /* Must be one. Load only */
-        uint32_t W      : 1;
-        uint32_t B      : 1; /* Must be one */
-        uint32_t U      : 1;
-        uint32_t P      : 1;
-        uint32_t opcode0: 3;
-        uint32_t cond   : 4;
-} ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset;
 
 
 typedef union ARMV4_Instruction
@@ -234,8 +197,6 @@ typedef union ARMV4_Instruction
 
     ARMV4_Instr_LoadStore_Half_ImmediateOffset          lsh_io;
     ARMV4_Instr_LoadStore_Half_RegisterOffset           lsh_ro;
-    ARMV4_Instr_LoadStore_Signed_Half_RegisterOffset    lsh_sro;
-    ARMV4_Instr_LoadStore_Signed_Half_ImmediateOffset   lsh_sio;
 
     uint32_t word;
 } ARMV4_Instruction;

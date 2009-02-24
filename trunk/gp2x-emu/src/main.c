@@ -155,3 +155,4 @@ void PrintInstruction(ARM_CPU* cpu, int type, uint32_t address)
     }
     return;
 }
+
