@@ -1197,9 +1197,9 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         case ARM_LoadStore_PostIndexed_T:
             /*  Temprarily changed CPSR here, to perform STRT, STRBT, LDRT or
                 LDRBT in user mode */
-            cpu->cpsr.f.mode = (unsigned)((1<<5) | ARM_CPU_MODE_USR);
+            cpu->cpsr.f.mode = (unsigned)((1<<4) | ARM_CPU_MODE_USR);
             loadstore_accessmemory(cpu, mem, *base, dest, L, B);
-            cpu->cpsr.f.mode = (unsigned)((1<<5) | mode);
+            cpu->cpsr.f.mode = (unsigned)((1<<4) | mode);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
             if(cond){ /* condition code controls the writeback */
