@@ -1211,10 +1211,22 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         break;
 
         case ARM_LoadStore_Offset:
-            if(U)
-                loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
-            else
-                loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
+            if(U){
+                if(Rn == PC){
+                    loadstore_accessmemory(cpu, mem, *base + 8 + index, dest, L, B);
+                }
+                else {
+                    loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+                }
+            }
+            else {
+                if(Rn == PC){
+                    loadstore_accessmemory(cpu, mem, *base + 8 - index, dest, L, B);
+                }
+                else {
+                    loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
+                }
+            }
             /* no exception checking here, as offsets don't do writebacks */
         break;
 
@@ -1235,6 +1247,9 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
         }
         break;
     }
+
+    if(Rd == PC)
+        FlushPipeline(cpu); /* branch */
 
     return cycles;
 }
@@ -1329,10 +1344,22 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
         ASSERT(!"Addressing mode 3 has no translation support!\n");
         break;
     ARM_LoadStore_Offset:
-        if(U)
-            loadstoreextra_accessmemory(cpu, mem, *base + index, dest, L, H, S);
-        else
-            loadstoreextra_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+        if(U){
+            if(Rn == PC){
+                loadstoreextra_accessmemory(cpu, mem, *base + 8 + index, dest, L, H, S);
+            }
+            else {
+                loadstoreextra_accessmemory(cpu, mem, *base + index, dest, L, H, S);            
+            }
+        }
+        else {
+            if(Rn == PC){
+                loadstoreextra_accessmemory(cpu, mem, *base + 8 - index, dest, L, H, S);
+            }
+            else {
+                loadstoreextra_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+            }
+        }
         break;
     ARM_LoadStore_PreIndexed:
         if(U){
@@ -1351,6 +1378,10 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
         }
         break;
     }
+
+    if(Rd == PC)
+        FlushPipeline(cpu); /* branch */
+
     return cycles;
 }
 
