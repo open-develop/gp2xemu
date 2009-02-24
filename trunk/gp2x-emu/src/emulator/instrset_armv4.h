@@ -153,7 +153,10 @@ typedef enum ARMV4_LoadStoreMode
 typedef struct ARMV4_Instr_LoadStore_Half_RegisterOffset
 {
         uint32_t Rm     : 4;
-        uint32_t opcode1: 4;
+        uint32_t opcode2: 1;
+        uint32_t H      : 1;
+        uint32_t S      : 1;
+        uint32_t opcode1: 1;
         uint32_t SBZ    : 4;
         uint32_t Rd     : 4;
         uint32_t Rn     : 4;
@@ -169,7 +172,10 @@ typedef struct ARMV4_Instr_LoadStore_Half_RegisterOffset
 typedef struct ARMV4_Instr_LoadStore_Half_ImmediateOffset
 {
         uint32_t LoOff  : 4;
-        uint32_t opcode1: 4;
+        uint32_t opcode2: 1;
+        uint32_t H      : 1;
+        uint32_t S      : 1;
+        uint32_t opcode1: 1;
         uint32_t HiOff  : 4;
         uint32_t Rd     : 4;
         uint32_t Rn     : 4;
@@ -207,7 +213,7 @@ typedef int (*instr_handler)(ARM_CPU*, ARM_Memory*, ARMV4_Instruction);
 /** Addressing modes **/
 void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int* carry_out);
 void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index);
-
+void AddressingMode3(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index);
 int CheckConditionFlag(ARM_CPU* cpu, int instr);
 
 /** Misc **/

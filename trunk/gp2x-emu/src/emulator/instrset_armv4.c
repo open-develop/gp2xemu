@@ -1186,26 +1186,28 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             loadstore_accessmemory(cpu, mem, *base, dest, L, B);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
-            if(cond)
+            if(cond){
                 if(U)            
                     *base += index;
                 else
                     *base -= index;
+            }
         break;
 
         case ARM_LoadStore_PostIndexed_T:
             /*  Temprarily changed CPSR here, to perform STRT, STRBT, LDRT or
                 LDRBT in user mode */
-            cpu->cpsr.f.mode = ((1U<<5U) | ARM_CPU_MODE_USR);
+            cpu->cpsr.f.mode = (unsigned)((1<<5) | ARM_CPU_MODE_USR);
             loadstore_accessmemory(cpu, mem, *base, dest, L, B);
-            cpu->cpsr.f.mode = ((1U<<5U) | mode);
+            cpu->cpsr.f.mode = (unsigned)((1<<5) | mode);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
-            if(cond) /* condition code controls the writeback */
+            if(cond){ /* condition code controls the writeback */
                 if(U)            
                     *base += index;
                 else
                     *base -= index;
+            }
         break;
 
         case ARM_LoadStore_Offset:
@@ -1237,7 +1239,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
     return cycles;
 }
 
-static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
+static void loadstoreextra_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
     uint32_t address, uint32_t* Rd, int L, int H, int S)
 {
     if(L){
@@ -1263,7 +1265,7 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
             doesn't require sign extending. The ARMV4_ParseInstrucion should already
             have caught this, hence the assert below.
         */
-        ASSERT(!S && !B);
+        ASSERT(!S && H);
         WriteMemory16(cpu, mem, address, *Rd); /* unsigned halfword only */
     }
     return;
@@ -1298,26 +1300,28 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
 
     GetStatusRegisterMode(cpu, CPSR, &mode);
 
-    H = instr.ls_io.H;
-    L = instr.ls_io.L;
-    U = instr.ls_io.U;
-    S = instr.ls_io.S;
-    Rn = instr.ls_io.Rn;
-    Rd = instr.ls_io.Rd;
+    H = instr.lsh_io.H;
+    L = instr.lsh_io.L;
+    U = instr.lsh_io.U;
+    S = instr.lsh_io.S;
+    Rn = instr.lsh_io.Rn;
+    Rd = instr.lsh_io.Rd;
+
     base = cpu->reg[mode][Rn];
     dest = cpu->reg[mode][Rd]; /* destination for LDR, source for STR */
 
     switch(type)
     {
     ARM_LoadStore_PostIndexed:
-        loadstore_accessmemory(cpu, mem, *base, dest, L, H, S);
+        loadstoreextra_accessmemory(cpu, mem, *base, dest, L, H, S);
         if(GetException(cpu, ARM_Exception_Data_Abort))
             break;
-        if(cond)
+        if(cond){
             if(U)
                 *base += index;
             else
                 *base -= index;
+        }
         break;
     ARM_LoadStore_PostIndexed_T:
         /* Address Mode 3 does not have a translation mode (P=0 && W=1) */
@@ -1326,20 +1330,20 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
         break;
     ARM_LoadStore_Offset:
         if(U)
-            loadstore_accessmemory(cpu, mem, *base + index, dest, L, H, S);
+            loadstoreextra_accessmemory(cpu, mem, *base + index, dest, L, H, S);
         else
-            loadstore_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+            loadstoreextra_accessmemory(cpu, mem, *base - index, dest, L, H, S);
         break;
     ARM_LoadStore_PreIndexed:
         if(U){
-            loadstore_accessmemory(cpu, mem, *base + index, dest, L, H, S);
+            loadstoreextra_accessmemory(cpu, mem, *base + index, dest, L, H, S);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break;
             if(cond)
                 *base += index;
         }
         else {
-            loadstore_accessmemory(cpu, mem, *base - index, dest, L, H, S);
+            loadstoreextra_accessmemory(cpu, mem, *base - index, dest, L, H, S);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break;
             if(cond)
