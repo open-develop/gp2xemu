@@ -422,3 +422,39 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
     return;
 }
 
+/*  Addressing mode 3 - Miscellaneous Loads and Stores 
+    Load/Store halfword and load signed halfword/byte
+    Refer to ARM Architecture Reference Manual page A5-34, revision A
+*/
+void AddressingMode3(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
+{
+/* members: lsh_io  and lsh_ro
+    B = 0 means register
+    B = 1 means immediate
+    PUBWL
+*/
+    uint32_t Rm, RmVal;
+    int mode;
+
+    ASSERT(index);
+
+    *index = 0;
+
+    if(instr.lsh_io.B){
+        /* immediate */
+        *index = (instr.lsh_io.HiOff << 4) | instr.lsh_io.LoOff;
+    }
+    else {
+        /* register */
+        Rm = instr.lsh_ro.Rm;
+        if(Rm == PC){
+            ASSERT(!"Illegal use of PC with addressing mode 3\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return;
+        }
+        GetStatusRegisterMode(cpu, CPSR, &mode);
+        RmVal = *cpu->reg[mode][Rm];
+        *index = RmVal;
+    }
+    return;
+}
