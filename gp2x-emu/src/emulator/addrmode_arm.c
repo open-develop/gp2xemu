@@ -356,7 +356,7 @@ void AddressingMode1(ARM_CPU* cpu, ARMV4_Instruction instr, ARM_Word* value, int
 
 void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
 {
-    uint32_t Rm, RmVal;
+    uint32_t Rm, Rn, RmVal;
     int mode;
 
     ASSERT(index);
@@ -371,6 +371,7 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
     else if(instr.ls_io.opcode0 == 0x3){
         /* Register offset (scaled) with shifts */
         Rm = instr.ls_ro.Rm;
+        Rn = instr.ls_ro.Rn;
         if(Rm == PC){
             ASSERT(!"Illegal use of PC with addressing mode 2\n");
             RaiseException(cpu, ARM_Exception_Unpredictable);
