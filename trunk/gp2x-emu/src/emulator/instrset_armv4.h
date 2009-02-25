@@ -188,6 +188,26 @@ typedef struct ARMV4_Instr_LoadStore_Half_ImmediateOffset
         uint32_t cond   : 4;
 } ARMV4_Instr_LoadStore_Half_ImmediateOffset;
 
+typedef enum ARMV4_LoadStoreMultipleMode
+{
+    ARM_LoadStoreMultiple_DecrementAfter = 0,   /* Same as Full  Ascending P=0, U=0 */
+    ARM_LoadStoreMultiple_IncrementAfter,       /* Same as Full  Descending P=0, U=0 */
+    ARM_LoadStoreMultiple_DecrementBefore,      /* Same as Empty Ascending P=0, U=0 */
+    ARM_LoadStoreMultiple_IncrementBefore        /* Same as Empty Descending P=0, U=0 */
+} ARMV4_LoadStoreMultipleMode;
+
+typedef struct ARMV4_Instr_LoadStoreMultiple
+{
+    uint32_t register_list  : 16;
+    uint32_t Rn             : 4;
+    uint32_t L              : 1;
+    uint32_t W              : 1;
+    uint32_t S              : 1;
+    uint32_t U              : 1;
+    uint32_t P              : 1;
+    uint32_t opcode0        : 3;
+    uint32_t cond           : 4;
+} ARMV4_Instr_LoadStoreMultiple;
 
 typedef union ARMV4_Instruction
 {
@@ -203,7 +223,8 @@ typedef union ARMV4_Instruction
 
     ARMV4_Instr_LoadStore_Half_ImmediateOffset          lsh_io;
     ARMV4_Instr_LoadStore_Half_RegisterOffset           lsh_ro;
-
+    
+    ARMV4_Instr_LoadStoreMultiple                       lsm;
     uint32_t word;
 } ARMV4_Instruction;
 

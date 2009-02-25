@@ -1126,6 +1126,7 @@ static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     the ARM9TDMI specification (ARM920T or ARM940T)
 */
 /* LDR, STR, LDRT, STRT, LDRB, STRB, LDRBT, STRBT */
+/* TODO: PC as Rd for STR and STRT is the PC + 12!!*/
 static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
     uint32_t address, uint32_t* Rd, int L, int B)
 {
@@ -1319,7 +1320,7 @@ static void loadstoreextra_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
         else { /* byte with this instruction are always signed extended */
             *Rd = ReadMemory8(cpu, mem, address);
             /* sign extend here */
-            if(*Rd & (1UL<<15UL)){ /* sign extend signed words */
+            if(*Rd & (1UL<<7UL)){ /* sign extend signed words */
                 *Rd |= 0xFFFFFF00;
             }
         }
@@ -1339,7 +1340,7 @@ static void loadstoreextra_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
 }
 
 /* LDRS, LDRSH, LDRSB and STRH */
-int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+static int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
     int type;
     int cond;
@@ -1374,6 +1375,8 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
     Rn = instr.lsh_io.Rn;
     Rd = instr.lsh_io.Rd;
 
+    ASSERT(Rd != PC);
+    
     base = cpu->reg[mode][Rn];
     dest = cpu->reg[mode][Rd]; /* destination for LDR, source for STR */
 
@@ -1437,6 +1440,102 @@ int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction inst
     return cycles;
 }
 
+/*
+typedef struct ARMV4_Instr_LoadStoreMultiple
+{
+    uint32_t register_list  : 16;
+    uint32_t Rn             : 4;
+    uint32_t L              : 1;
+    uint32_t W              : 1;
+    uint32_t S              : 1;
+    uint32_t U              : 1;
+    uint32_t P              : 1;
+    uint32_t opcode0        : 3;
+    uint32_t cond           : 4;
+} ARMV4_Instr_LoadStoreMultiple;
+*/
+
+/*
+if STR, STRT and STM stores PC, the effective value is PC + 12
+During a data abort, the base register and PC are UNCHANGED
+If the access uses only one register, the register is UNCHANGED
+All other cases gives undefined values for all register EXCEPT the base register and PC
+*/
+
+static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t dst_beg, dst_end, transfer_size, Rn, address, base, pc;
+    int cycles;
+    int regcount;
+    int type;
+    int mode, i;
+    cycles = 0;
+    /**Rd = ReadMemory16(cpu, mem, address);*/
+    if(!CheckConditionFlag(cpu, instr.lsm.cond))
+        return cycles;
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    Rn = instr.lsm.Rn;
+    for(i=0,regcount=0;i<16;++i)
+        if(instr.lsm.register_list & (1<<i))
+            ++regcount;
+    transfer_size = regcount*4;
+    
+    type = (instr.lsm.P<<1)|instr.lsm.U;
+    /* Base should NEVER be overwritten, so we make
+        a copy.*/
+    base = *cpu->reg[mode][Rn];
+    pc = *cpu->reg[mode][PC];
+    
+    /* P<<1 | U Gives us four combinations as shown below,
+        (I)ncrement (B)efore, (I)ncrement (A)fter,
+        (D)ecrement (B)efore, and (D)ecrement (A)fter
+    */
+    switch(type)
+    {
+        case ARM_LoadStoreMultiple_DecrementAfter:
+            dst_beg = base - transfer_size + 4;
+            dst_end = base;
+        break;
+        case ARM_LoadStoreMultiple_IncrementAfter:
+            dst_beg = base;
+            dst_end = base + transfer_size - 4;
+        break;
+        case ARM_LoadStoreMultiple_DecrementBefore:
+            dst_beg = base - transfer_size;
+            dst_end = base - 4;
+        break;
+        case ARM_LoadStoreMultiple_IncrementBefore:
+            dst_beg = base + 4;
+            dst_end = base + transfer_size;
+        break;
+    }
+    
+    if(instr.lsm.L){ /* Load LDM */
+        for(i = 0, address = dst_beg; address <= dst_end; address += 4){
+            while(!(instr.lsm.register_list & (1<<i)))
+                ++i;
+            *cpu->reg[mode][i] = ReadMemory32(cpu, mem, address);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break;   
+        }
+    }
+    else { /* Store STM */
+        for(i = 0, address = dst_beg; address <= dst_end; address += 4){
+            while(!(instr.lsm.register_list & (1<<i)))
+                ++i;
+            WriteMemory32(cpu, mem, address, *cpu->reg[mode][i]);
+            if(GetException(cpu, ARM_Exception_Data_Abort))
+                break;   
+        }    
+    }
+    
+    if(GetException(cpu, ARM_Exception_Data_Abort)){
+        *cpu->reg[mode][Rn] = base; /*restore */
+        *cpu->reg[mode][PC] = pc;
+    }
+    
+    return cycles;
+}
 
 int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr, int type)
 {
@@ -1488,6 +1587,8 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             return handler_loadstore(cpu, mem, instr);
         case ARMV4_TypeLoadStoreExtra:
             return handler_loadstoreextra(cpu, mem, instr);
+        case ARMV4_TypeLoadStoreMultiple:
+            return handler_loadstoremultiple(cpu, mem, instr);
         default:
             ASSERT(!"Instruction not yet implemented.\n");
     }
