@@ -376,6 +376,12 @@ void AddressingMode2(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
             RaiseException(cpu, ARM_Exception_Unpredictable);
             return;
         }
+
+        if(Rn == Rm){
+            ASSERT(!"Rn == Rm is unpredictable\n");
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            return;
+        }
         
         GetStatusRegisterMode(cpu, CPSR, &mode);
         RmVal = *cpu->reg[mode][Rm];
