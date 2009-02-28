@@ -1464,36 +1464,56 @@ if STR, STRT and STM stores PC, the effective value is PC + 12
 During a data abort, the base register and PC are UNCHANGED
 If the access uses only one register, the register is UNCHANGED
 All other cases gives undefined values for all register EXCEPT the base register and PC
+Usermode with writeback is UNPREDICTABLE
 */
 
 static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
-    uint32_t dst_beg, dst_end, transfer_size, Rn, address, base, pc;
+    uint32_t dst_beg, dst_end, transfer_size, Rn, address, base, pc, tmpval;
     int cycles;
     int regcount;
     int type;
-    int mode, i;
+    int mode, mode_dst, i;
     cycles = 0;
-    /**Rd = ReadMemory16(cpu, mem, address);*/
+
     if(!CheckConditionFlag(cpu, instr.lsm.cond))
         return cycles;
+
+    if(!instr.lsm.register_list){
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        ASSERT(!"LDM/STM with empty register list is not allowed!\n");
+        return 0;
+    }
+    
     GetStatusRegisterMode(cpu, CPSR, &mode);
     Rn = instr.lsm.Rn;
-    for(i=0,regcount=0;i<16;++i)
+    
+    if(Rn == PC){
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        ASSERT(!"LDM/STM with PC as base is not allowed!\n");
+        return 0;
+    }
+    
+    /* Todo: check if the register is the first in the list */
+    if((instr.lsm.register_list & (1<<Rn)) && instr.lsm.W){
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        ASSERT(!"Base register (with writeback) is also in the register list!\n");
+        return 0;
+    }
+    
+    for(i=0,regcount=0;i<16;++i){
         if(instr.lsm.register_list & (1<<i))
             ++regcount;
+    }
     transfer_size = regcount*4;
-    
     type = (instr.lsm.P<<1)|instr.lsm.U;
-    /* Base should NEVER be overwritten, so we make
+    /* Base and r15 should NEVER be overwritten, so we'll make
         a copy.*/
     base = *cpu->reg[mode][Rn];
     pc = *cpu->reg[mode][PC];
     
-    /* P<<1 | U Gives us four combinations as shown below,
-        (I)ncrement (B)efore, (I)ncrement (A)fter,
-        (D)ecrement (B)efore, and (D)ecrement (A)fter
-    */
+    /* type is P<<1 | U which gives us four combinations as shown below */
+    
     switch(type)
     {
         case ARM_LoadStoreMultiple_DecrementAfter:
@@ -1513,32 +1533,301 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
             dst_end = base + transfer_size;
         break;
     }
+
+    /* reuse type here, but this time to handle LDR/STRs which does user mode*/
+    type = (instr.lsm.S<<1) | instr.lsm.L;
     
-    if(instr.lsm.L){ /* Load LDM */
-        for(i = 0, address = dst_beg; address <= dst_end; address += 4){
+    switch(type)
+    {
+        case 0x0:
+        /* Normal store. Saved PC = current instruction + 12*/
+        mode_dst = (1<<4) | mode;
+        break;
+        
+        case 0x1:
+        /* Normal load. PC can branch, and ignores bits [1:0]*/
+        mode_dst = (1<<4) | mode;
+        break;
+                
+        case 0x2:
+        /* User mode store. Check for writeback here */
+        if(mode == ARM_CPU_MODE_USR || mode == ARM_CPU_MODE_SYS){
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            ASSERT(!"STM with CPSR update not allowed in modes \
+            without a SPSR!\n");
+            return 0;
+        }
+        if(instr.lsm.W){
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            ASSERT(!"Writeback not allowed for STM with user mode!\n");
+            return 0;
+        }
+        mode_dst = (1<<4) | ARM_CPU_MODE_USR;
+        break;
+
+        case 0x3:
+            /* With PC in the register list */
+            if(instr.lsm.register_list & (1<<PC)){
+                if(mode == ARM_CPU_MODE_USR || mode == ARM_CPU_MODE_SYS){
+                    RaiseException(cpu, ARM_Exception_Unpredictable);
+                    ASSERT(!"LDM with CPSR update not allowed in modes \
+                    without a SPSR!\n");
+                    return 0;
+                }
+                /* CPSR = SPSR */
+                mode_dst = (1<<4) | mode;
+            }
+            else { /* Without PC in the register list */
+                if(instr.lsm.W){
+                    RaiseException(cpu, ARM_Exception_Unpredictable);
+                    ASSERT(!"Writeback not allowed for LDM with user mode!\n");
+                    return 0;
+                }
+                mode_dst = (1<<4) | ARM_CPU_MODE_USR;
+            }
+        break;
+    }
+    
+    /* TODO: Handle thumb branches properly for LDMs which do CPSR = SPSR
+        Handle allignment properly, both with and without System Control alignment checking*/
+    if(instr.lsm.L){ /* LDM */
+        for(i = 0, address = dst_beg; address <= dst_end; ++i, address += 4){
             while(!(instr.lsm.register_list & (1<<i)))
                 ++i;
-            *cpu->reg[mode][i] = ReadMemory32(cpu, mem, address);
+            if(i==PC){
+                tmpval = ReadMemory32(cpu, mem, address);
+                *cpu->reg[mode_dst][i] =  tmpval & 0xFFFFFFFC;
+                FlushPipeline(cpu);
+            }
+            else {
+                *cpu->reg[mode_dst][i] = ReadMemory32(cpu, mem, address);
+            }
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break;   
         }
     }
-    else { /* Store STM */
-        for(i = 0, address = dst_beg; address <= dst_end; address += 4){
+    else { /* STM */
+        for(i = 0, address = dst_beg; address <= dst_end; ++i, address += 4){
             while(!(instr.lsm.register_list & (1<<i)))
                 ++i;
-            WriteMemory32(cpu, mem, address, *cpu->reg[mode][i]);
+            ASSERT(i < 16);
+            if(i==PC)
+                WriteMemory32(cpu, mem, address, *cpu->reg[mode_dst][i] + 12);
+            else
+                WriteMemory32(cpu, mem, address, *cpu->reg[mode_dst][i]);
             if(GetException(cpu, ARM_Exception_Data_Abort))
-                break;   
+                break;
         }    
     }
     
-    if(GetException(cpu, ARM_Exception_Data_Abort)){
-        *cpu->reg[mode][Rn] = base; /*restore */
-        *cpu->reg[mode][PC] = pc;
+    if(instr.lsm.W && !GetException(cpu, ARM_Exception_Data_Abort)){
+        *cpu->reg[mode][Rn] += transfer_size * 4;
+    }
+    else if(GetException(cpu, ARM_Exception_Data_Abort)){
+        *cpu->reg[mode_dst][Rn] = base; /*restore */
+        *cpu->reg[mode_dst][PC] = pc;
+        return 0;
+    }
+    if(instr.lsm.S && instr.lsm.L){
+        /* A check for illegal modes without an SPSR
+            is done at the top of this function */
+        cpu->cpsr = cpu->spsr[mode];
     }
     
     return cycles;
+}
+
+static int handler_branch(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    uint32_t value, Rm;
+    int mode, cycles;
+    
+    cycles = 0;
+    
+    if(!CheckConditionFlag(cpu, instr.branch.cond))
+        return 0;
+        
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    if(instr.branch.opcode0 == 0x5){
+        value = instr.branch.immed24;
+        if(value & (1<<23))
+            value |= 0xFF000000; /* sign extend */
+        value << 2;
+        if(instr.branch.L)
+            *cpu->reg[mode][LR] = *cpu->reg[mode][PC] + 4;
+        *cpu->reg[mode][PC] += value + 8;
+    }
+    else if(!instr.branch.opcode0){
+        /* BX
+        TODO: Make a proper birfield struct for this instruction */
+        Rm = instr.branch.immed24 & 0xF;
+        if( (*cpu->reg[mode][Rm] & 0x2) && !(*cpu->reg[mode][Rm] & 0x1)){
+            RaiseException(cpu, ARM_Exception_Unpredictable);
+            ASSERT(!"Can't branch to non-aligned address in ARM mode!\n");
+            return 0;
+        }
+        cpu->cpsr.f.thumb = *cpu->reg[mode][Rm] & 0x1;
+        *cpu->reg[mode][PC] = *cpu->reg[mode][Rm] & 0xFFFFFFFE;
+   }
+   FlushPipeline(cpu);   
+   return cycles;     
+}
+
+static int handler_statusreg(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+/*
+    instr.mrs;
+    instr.msr_im;
+    instr.msr_rs;
+*/
+    uint32_t Rd, value, immed, rot, mask;
+    int opcode;
+    int cycles;
+    int mode;
+    
+    opcode = (instr.mrs.opcode1<<2) | instr.mrs.opcode0;
+    
+    if(!CheckConditionFlag(cpu, instr.branch.cond))
+        return 0;
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    
+    if(instr.mrs.R && ( (mode == ARM_CPU_MODE_USR) || (mode == ARM_CPU_MODE_SYS))){
+        RaiseException(cpu, ARM_Exception_Unpredictable);
+        ASSERT(!"MRS/MSR trying to read SPSR in non-privileged mode!\n");
+        return 0;
+    }
+            
+    switch(opcode)
+    {
+        case 0x8:
+            /* MRS */
+            if(instr.mrs.Rd == PC){
+                RaiseException(cpu, ARM_Exception_Unpredictable);
+                ASSERT(!"Rd as PC is unpredictable!\n");
+                return 0;
+            }
+            
+            Rd = instr.mrs.Rd;
+            if(instr.mrs.R)
+                *cpu->reg[mode][Rd] = cpu->spsr[mode].value;
+            else
+                *cpu->reg[mode][Rd] = cpu->cpsr.value;
+            return cycles;
+        break;
+        
+        case 0xA:
+            /* MSR register */
+            value = *cpu->reg[mode][instr.msr_rs.Rm];
+            
+        break;
+        case 0x1A:
+            /* MSR immediate */
+            immed = instr.msr_im.immed;
+            rot = instr.msr_im.rotate_imm * 2;
+            value = (immed >> rot) | (immed << (32 - rot));
+        break;
+        
+        default:
+        ASSERT(!"Error handler_statusreg. Fix opcode handling.\n");
+        break;
+    }
+    
+    mask = instr.msr_im.fieldmask;
+    
+    if(instr.msr_im.R){
+        if(mask & 0x1){
+            /* control bits: cpu mode, thumb, FIQ and IRQ */
+            cpu->spsr[mode].value &= ~0xFF;
+            cpu->spsr[mode].value |= (value & 0xFF);
+        }
+        if(mask & 0x2){
+            cpu->spsr[mode].value &= ~0xFF00;
+            cpu->spsr[mode].value |= (value & 0xFF00);
+        }
+        if(mask & 0x4){
+            cpu->spsr[mode].value &= ~0xFF0000;
+            cpu->spsr[mode].value |= (value & 0xFF0000);
+        }
+        if(mask & 0x8){
+            /* data-processing flags, N,Z,C,V (Q not used) */
+            cpu->spsr[mode].value &= ~0xFF000000;
+            cpu->spsr[mode].value |= (value & 0xFF000000);
+        }
+    }
+    else {
+        if(mode != ARM_CPU_MODE_USR && mode != ARM_CPU_MODE_SYS){
+            if(mask & 0x1){
+                /* control bits: cpu mode, thumb, FIQ and IRQ */
+                cpu->cpsr.value &= ~0xFF;
+                cpu->cpsr.value |= (value & 0xFF);
+            }
+            if(mask & 0x2){
+                cpu->cpsr.value &= ~0xFF00;
+                cpu->cpsr.value |= (value & 0xFF00);
+            }
+            if(mask & 0x4){
+                cpu->cpsr.value &= ~0xFF0000;
+                cpu->cpsr.value |= (value & 0xFF0000);
+            }
+        }
+        if(mask & 0x8){
+            /* data-processing flags, N,Z,C,V (Q not used) */
+            cpu->cpsr.value &= ~0xFF000000;
+            cpu->cpsr.value |= (value & 0xFF000000);
+        }
+    }
+    return cycles;
+}
+
+/*
+typedef struct ARMV4_Instr_Swap
+{
+    uint32_t Rm         : 4;
+    uint32_t opcode1    : 4;
+    uint32_t SBZ        : 4;
+    uint32_t Rd         : 4;
+    uint32_t Rn         : 4;
+    uint32_t opcode0    : 8;
+    uint32_t cond       : 4;
+} ARMV4_Instr_Swap;
+*/
+int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    /* bit 22 differs between byte and word */
+    /* TODO: Add proper shifts for misaligned addresses */
+    /* TODO: Implement proper data abort model */
+    
+    uint32_t Rn, Rd, Rm, *RdPtr, RnVal, RmVal;
+    int B, mode, cycles;
+    
+    cycles = 0;
+    
+    if(!CheckConditionFlag(cpu, instr.swap.cond))
+        return 0;
+    GetStatusRegisterMode(cpu, CPSR, &mode);
+    B = instr.word & (1<<22);
+    
+    Rm = instr.swap.Rm;
+    Rn = instr.swap.Rn;
+    Rd = instr.swap.Rd;
+    RdPtr = cpu->reg[mode][Rd];
+    RnVal = *cpu->reg[mode][Rn];
+    RmVal = *cpu->reg[mode][Rm];
+    
+    if(B){
+        *RdPtr = ReadMemory8(cpu, mem, RnVal);
+        WriteMemory8(cpu, mem, RnVal, RmVal & 0xFF);
+    }
+    else {
+        *RdPtr = ReadMemory32(cpu, mem, RnVal);
+        WriteMemory32(cpu, mem, RnVal, RmVal);
+    }
+    return cycles;
+}
+
+int handler_cputransfer(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+{
+    return 0;
 }
 
 int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr, int type)
@@ -1593,6 +1882,24 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             return handler_loadstoreextra(cpu, mem, instr);
         case ARMV4_TypeLoadStoreMultiple:
             return handler_loadstoremultiple(cpu, mem, instr);
+        case ARMV4_TypeBranch:
+            return handler_branch(cpu, mem, instr);
+        case ARMV4_TypeStatusRegister:
+            return handler_statusreg(cpu, mem, instr);
+        case ARMV4_TypeAtomicSwap:
+            return handler_swap(cpu, mem, instr);
+        case ARMV4_TypeSoftwareInterrupt:
+            RaiseException(cpu, ARM_Exception_Software_Interrupt);
+            return 0; /* change this to cycles for a branch */
+            /* MCR/MRC is used by CP15, the System Control */
+        case ARMV4_TypeRegisterTransferCoprocessor:
+            return handler_cputransfer(cpu, mem, instr);
+        
+        /* No coprocessors, except CP15, which doesn't allow CDP/LDC/STC */
+        case ARMV4_TypeLoadStoreCoprocessor:
+        case ARMV4_TypeDataProcessingCoprocessor:
+            RaiseException(cpu, ARM_Exception_Undefined);
+            return 0; /* change this to cycles for a branch */
         default:
             ASSERT(!"Instruction not yet implemented.\n");
     }
