@@ -465,3 +465,4 @@ void AddressingMode3(ARM_CPU* cpu, ARMV4_Instruction instr, uint32_t* index)
     }
     return;
 }
+

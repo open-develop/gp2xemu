@@ -209,9 +209,62 @@ typedef struct ARMV4_Instr_LoadStoreMultiple
     uint32_t cond           : 4;
 } ARMV4_Instr_LoadStoreMultiple;
 
+typedef struct ARMV4_Instr_Branch
+{
+    uint32_t immed24    : 24; /* signed */
+    uint32_t L          : 1;
+    uint32_t opcode0    : 3;
+    uint32_t cond       : 4;
+} ARMV4_Instr_Branch;
+
+typedef struct ARMV4_Instr_MRS
+{
+    uint32_t SBZ    : 12;
+    uint32_t Rd     : 4;
+    uint32_t SBO    : 4;
+    uint32_t opcode1: 2;
+    uint32_t R      : 1;
+    uint32_t opcode0: 5;
+    uint32_t cond   : 4;
+} ARMV4_Instr_MRS;
+
+typedef struct ARMV4_Instr_MSR_Immediate
+{
+    uint32_t immed      : 8;
+    uint32_t rotate_imm : 4;
+    uint32_t SBO        : 4;
+    uint32_t fieldmask  : 4;
+    uint32_t opcode1    : 2;
+    uint32_t R          : 1;
+    uint32_t opcode0    : 5;
+    uint32_t cond       : 4;
+} ARMV4_Instr_MSR_Immediate;
+
+typedef struct ARMV4_Instr_MSR_Register
+{
+    uint32_t Rm         : 4;
+    uint32_t SBZ        : 8;
+    uint32_t SBO        : 4;
+    uint32_t fieldmask  : 4;
+    uint32_t opcode1    : 2;
+    uint32_t R          : 1;
+    uint32_t opcode0    : 5;
+    uint32_t cond       : 4;
+} ARMV4_Instr_MSR_Register;
+
+typedef struct ARMV4_Instr_Swap
+{
+    uint32_t Rm         : 4;
+    uint32_t opcode1    : 4;
+    uint32_t SBZ        : 4;
+    uint32_t Rd         : 4;
+    uint32_t Rn         : 4;
+    uint32_t opcode0    : 8;
+    uint32_t cond       : 4;
+} ARMV4_Instr_Swap;
+
 typedef union ARMV4_Instruction
 {
-    /* 'shift' is LSL, LSR, ASR, ROR */
     ARMV4_Instr_DataProc_Immediate                      dp_im;
     ARMV4_Instr_DataProc_Immed_Shift                    dp_is;
     ARMV4_Instr_DataProc_Register_Shift                 dp_rs;
@@ -225,8 +278,16 @@ typedef union ARMV4_Instruction
     ARMV4_Instr_LoadStore_Half_RegisterOffset           lsh_ro;
     
     ARMV4_Instr_LoadStoreMultiple                       lsm;
+    ARMV4_Instr_Branch                                  branch;
+    
+    ARMV4_Instr_MRS                                     mrs;
+    ARMV4_Instr_MSR_Immediate                           msr_im;
+    ARMV4_Instr_MSR_Register                            msr_rs;
+    ARMV4_Instr_Swap                                    swap;
+    
     uint32_t word;
 } ARMV4_Instruction;
+
 
 /* function pointer type for instruction handlers */
 typedef int (*instr_handler)(ARM_CPU*, ARM_Memory*, ARMV4_Instruction);
