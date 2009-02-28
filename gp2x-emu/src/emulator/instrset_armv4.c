@@ -1128,8 +1128,10 @@ static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 /* LDR, STR, LDRT, STRT, LDRB, STRB, LDRBT, STRBT */
 /* TODO: PC as Rd for STR and STRT is the PC + 12!!*/
 static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
-    uint32_t address, uint32_t* Rd, int L, int B)
+    uint32_t address, uint32_t* Rd, uint32_t index, int L, int B)
 {
+
+
     if(L){
         if(B)
             *Rd = ReadMemory8(cpu, mem, address);
@@ -1139,8 +1141,10 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
     else {
         if(B)
             WriteMemory8(cpu, mem, address, *Rd);
-        else
-            WriteMemory32(cpu, mem, address, *Rd);
+        else{
+            uint32_t tmp = address + 12 * (index == PC?1:0);
+            WriteMemory32(cpu, mem, tmp, *Rd);
+        }
     }
     return;
 }
@@ -1202,7 +1206,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     return 0;
                 }
             }
-            loadstore_accessmemory(cpu, mem, *base, dest, L, B);
+            loadstore_accessmemory(cpu, mem, *base, dest, Rd, L, B);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
             if(cond){
@@ -1227,7 +1231,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                 return 0;
             }
             cpu->cpsr.f.mode = (unsigned)((1<<4) | ARM_CPU_MODE_USR);
-            loadstore_accessmemory(cpu, mem, *base, dest, L, B);
+            loadstore_accessmemory(cpu, mem, *base, dest, Rd, L, B);
             cpu->cpsr.f.mode = (unsigned)((1<<4) | mode);
             if(GetException(cpu, ARM_Exception_Data_Abort))
                 break; /* Restored data abort model. Don't do writebacks */
@@ -1246,7 +1250,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-                if(((*base + index) & 0x3)){
+                if(((*base + index + 8 ) & 0x3)){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1254,18 +1258,18 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
             }
             if(U){
                 if(Rn == PC){
-                    loadstore_accessmemory(cpu, mem, *base + 8 + index, dest, L, B);
+                    loadstore_accessmemory(cpu, mem, *base + 8 + index, dest, Rd, L, B);
                 }
                 else {
-                    loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+                    loadstore_accessmemory(cpu, mem, *base + index, dest, Rd, L, B);
                 }
             }
             else {
                 if(Rn == PC){
-                    loadstore_accessmemory(cpu, mem, *base + 8 - index, dest, L, B);
+                    loadstore_accessmemory(cpu, mem, *base + 8 - index, dest, Rd, L, B);
                 }
                 else {
-                    loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
+                    loadstore_accessmemory(cpu, mem, *base - index, dest, Rd, L, B);
                 }
             }
             /* no exception checking here, as offsets don't do writebacks */
@@ -1285,14 +1289,14 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                 }
             }
             if(U){
-                loadstore_accessmemory(cpu, mem, *base + index, dest, L, B);
+                loadstore_accessmemory(cpu, mem, *base + index, dest, Rd, L, B);
                 if(GetException(cpu, ARM_Exception_Data_Abort))
                     break; /* Restored data abort model. Don't do writebacks */
                 if(cond)
                     *base += index;
             }
             else {
-                loadstore_accessmemory(cpu, mem, *base - index, dest, L, B);
+                loadstore_accessmemory(cpu, mem, *base - index, dest, Rd, L, B);
                 if(GetException(cpu, ARM_Exception_Data_Abort))
                     break; /* Restored data abort model. Don't do writebacks */
                 if(cond)
