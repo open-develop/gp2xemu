@@ -1286,7 +1286,8 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
 
                 if(U)
                     tmp += index;
-                else tmp -=index;
+                else
+                    tmp -=index;
 
                 tmp += (Rn == PC)?8:0;
 
@@ -1741,6 +1742,7 @@ static int handler_statusreg(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
     
     DPRINT();
     opcode = (instr.mrs.opcode1<<2) | instr.mrs.opcode0;
+    cycles = 0;
     
     if(!CheckConditionFlag(cpu, instr.branch.cond))
         return 0;
@@ -1846,7 +1848,7 @@ typedef struct ARMV4_Instr_Swap
     uint32_t cond       : 4;
 } ARMV4_Instr_Swap;
 */
-int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+static int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
     /* bit 22 differs between byte and word */
     /* TODO: Add proper shifts for misaligned addresses */
@@ -1881,7 +1883,7 @@ int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     return cycles;
 }
 
-int handler_cputransfer(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
+static int handler_cputransfer(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
     DPRINT();
     return 0;
@@ -1963,5 +1965,4 @@ int ARMV4_ExecuteInstruction(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
 
     return 0;
 }
-
 

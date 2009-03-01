@@ -47,7 +47,7 @@ int main(int argc, const char* argv[])
     char cmd[10];
     SDL_Event e;
     int quit;
-    
+    unsigned long numcycles;
     if(argc != 2){
         printf("Usage: %s <foo.rom>\n", argv[0]);
         return 0;
@@ -62,7 +62,7 @@ int main(int argc, const char* argv[])
     
     /* stack cheat*/
     *cpu.reg[3][SP] = 0x01000000;
-    
+    numcycles = 0;
     while(!quit)
     {
 #if 0
@@ -75,8 +75,10 @@ int main(int argc, const char* argv[])
             pc = GetProgramCounter(&cpu);
             instr_arm = ReadInstruction32(&cpu, &mem);
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
-            PrintInstruction(&cpu, type, *pc);
+//            PrintInstruction(&cpu, type, *pc);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
+            cpu.cpubusywait = 0; /* test */
+            ++numcycles; /* test */
 #if 1            
             if(cpu.exception) /* test */
                 break;
@@ -106,6 +108,9 @@ int main(int argc, const char* argv[])
         
     }
     DestroyMemory(&mem);
+    printf("Time elapsed: %f\n", (float)SDL_GetTicks() * 0.001f);
+    printf("Instructions executed: %lu\n", numcycles);
+    printf("MIPS: %f\n",((float)numcycles / ((float)SDL_GetTicks() * 0.001f)) * 0.000001f);
     return 0;
 }
 
