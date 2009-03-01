@@ -60,8 +60,8 @@ int main(int argc, const char* argv[])
     DestroyNAND(&nand);
     quit = 0;
     
-    /* stack cheat bail on E4*/
-    *cpu.reg[3][SP] = 0x01FFFFFC;
+    /* stack cheat*/
+    *cpu.reg[3][SP] = 0x01000000;
     
     while(!quit)
     {
@@ -75,10 +75,12 @@ int main(int argc, const char* argv[])
             pc = GetProgramCounter(&cpu);
             instr_arm = ReadInstruction32(&cpu, &mem);
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
-//            PrintInstruction(&cpu, type, *pc);
+            PrintInstruction(&cpu, type, *pc);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
+#if 1            
             if(cpu.exception) /* test */
                 break;
+#endif
             exp = HandleException(&cpu); /*undefined, interrupt, SWI, data abort, etc */
 
             if(exp == ARM_Exception_Unpredictable){
