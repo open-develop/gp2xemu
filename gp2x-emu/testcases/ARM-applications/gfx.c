@@ -18,8 +18,9 @@ void entrypoint(void)
     while(1){
         for(i=0;i<VIDEOMEM_LEN;++i){
             VIDEOMEM_START[i] = rotate_right(val, (i & 31));
-            *VIDEOMEM_UPDATE = 1;
         }
+        *VIDEOMEM_UPDATE = 1;
+        val = ~val;
     }
     return;
 }

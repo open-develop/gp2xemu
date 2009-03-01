@@ -4,7 +4,7 @@ loader.rom:     file format binary
 Disassembly of section .data:
 
 00000000 <.data>:
-   0:	ea000006 	b	0x20
+   0:	ea000008 	b	0x28
    4:	e24ff008 	sub	pc, pc, #8	; 0x8
    8:	e24ff008 	sub	pc, pc, #8	; 0x8
    c:	e24ff008 	sub	pc, pc, #8	; 0x8
@@ -12,50 +12,25 @@ Disassembly of section .data:
   14:	e24ff008 	sub	pc, pc, #8	; 0x8
   18:	e24ff008 	sub	pc, pc, #8	; 0x8
   1c:	e24ff008 	sub	pc, pc, #8	; 0x8
-  20:	e92d4010 	stmdb	sp!, {r4, lr}
-  24:	e24dd014 	sub	sp, sp, #20	; 0x14
-  28:	e3a03b4b 	mov	r3, #76800	; 0x12c00
-  2c:	e58d3004 	str	r3, [sp, #4]
-  30:	e3a03102 	mov	r3, #-2147483648	; 0x80000000
-  34:	e58d3008 	str	r3, [sp, #8]
-  38:	e59f3070 	ldr	r3, [pc, #112]	; 0xb0
-  3c:	e58d300c 	str	r3, [sp, #12]
-  40:	e59f306c 	ldr	r3, [pc, #108]	; 0xb4
-  44:	e58d3010 	str	r3, [sp, #16]
-  48:	e3a03000 	mov	r3, #0	; 0x0
-  4c:	e58d3000 	str	r3, [sp]
-  50:	ea000011 	b	0x9c
-  54:	e59d3000 	ldr	r3, [sp]
-  58:	e1a03103 	mov	r3, r3, lsl #2
-  5c:	e1a02003 	mov	r2, r3
-  60:	e59d3008 	ldr	r3, [sp, #8]
-  64:	e0824003 	add	r4, r2, r3
-  68:	e59d3000 	ldr	r3, [sp]
-  6c:	e203301f 	and	r3, r3, #31	; 0x1f
-  70:	e59d0010 	ldr	r0, [sp, #16]
-  74:	e1a01003 	mov	r1, r3
-  78:	eb00000e 	bl	0xb8
-  7c:	e1a03000 	mov	r3, r0
-  80:	e5843000 	str	r3, [r4]
-  84:	e59d200c 	ldr	r2, [sp, #12]
-  88:	e3a03001 	mov	r3, #1	; 0x1
-  8c:	e5823000 	str	r3, [r2]
-  90:	e59d3000 	ldr	r3, [sp]
-  94:	e2833001 	add	r3, r3, #1	; 0x1
-  98:	e58d3000 	str	r3, [sp]
-  9c:	e59d2000 	ldr	r2, [sp]
-  a0:	e59d3004 	ldr	r3, [sp, #4]
-  a4:	e1520003 	cmp	r2, r3
-  a8:	3affffe9 	bcc	0x54
-  ac:	eaffffe5 	b	0x48
-  b0:	8004b000 	andhi	fp, r4, r0
-  b4:	00ff00ff 	ldreqsh	r0, [pc, #15]	; 0xcb
-  b8:	e24dd008 	sub	sp, sp, #8	; 0x8
-  bc:	e58d0004 	str	r0, [sp, #4]
-  c0:	e58d1000 	str	r1, [sp]
-  c4:	e59d2004 	ldr	r2, [sp, #4]
-  c8:	e59d3000 	ldr	r3, [sp]
-  cc:	e1a03372 	mov	r3, r2, ror r3
-  d0:	e1a00003 	mov	r0, r3
-  d4:	e28dd008 	add	sp, sp, #8	; 0x8
-  d8:	e12fff1e 	bx	lr
+  20:	e1a00170 	mov	r0, r0, ror r1
+  24:	e12fff1e 	bx	lr
+  28:	e92d40f0 	stmdb	sp!, {r4, r5, r6, r7, lr}
+  2c:	e59f603c 	ldr	r6, [pc, #60]	; 0x70
+  30:	e59f703c 	ldr	r7, [pc, #60]	; 0x74
+  34:	e3a04000 	mov	r4, #0	; 0x0
+  38:	e1a01004 	mov	r1, r4
+  3c:	e3a05102 	mov	r5, #-2147483648	; 0x80000000
+  40:	e201101f 	and	r1, r1, #31	; 0x1f
+  44:	e1a00006 	mov	r0, r6
+  48:	ebfffff4 	bl	0x20
+  4c:	e2844001 	add	r4, r4, #1	; 0x1
+  50:	e3540b4b 	cmp	r4, #76800	; 0x12c00
+  54:	e4850004 	str	r0, [r5], #4
+  58:	e1a01004 	mov	r1, r4
+  5c:	1afffff7 	bne	0x40
+  60:	e3a03001 	mov	r3, #1	; 0x1
+  64:	e1e06006 	mvn	r6, r6
+  68:	e5873000 	str	r3, [r7]
+  6c:	eafffff0 	b	0x34
+  70:	00ff00ff 	ldreqsh	r0, [pc, #15]	; 0x87
+  74:	8004b000 	andhi	fp, r4, r0
