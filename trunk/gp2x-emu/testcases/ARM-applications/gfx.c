@@ -16,9 +16,10 @@ void entrypoint(void)
     
     unsigned long val = 0x00FF00FF;
     while(1){
-        for(i=0;i<VIDEOMEM_LEN;++i)
+        for(i=0;i<VIDEOMEM_LEN;++i){
             VIDEOMEM_START[i] = rotate_right(val, (i & 31));
-        *VIDEOMEM_UPDATE = 1;
+            *VIDEOMEM_UPDATE = 1;
+        }
     }
     return;
 }
