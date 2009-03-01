@@ -1142,9 +1142,10 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
         if(B)
             WriteMemory8(cpu, mem, address, *Rd);
         else{
-
-            uint32_t tmp = address + 12 * (index == PC?1:0);
-            WriteMemory32(cpu, mem, tmp, *Rd);
+            if(index = PC)
+                WriteMemory32(cpu, mem, address, *Rd + 12);
+            else
+                WriteMemory32(cpu, mem, address, *Rd);
         }
     }
     return;
@@ -1251,15 +1252,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-
-                uint32_t tmp = *base;
-
-                if(U)
-                    tmp += index;
-                else tmp -= index;
-                tmp += (8 * (Rn == PC)?1:0);
-
-                if(tmp & 0x3){
+                if(((*base + index + 8 ) & 0x3)){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1291,15 +1284,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-
-                uint32_t tmp = *base;
-
-                if(U)
-                    tmp += index;
-                else tmp -= index;
-
-                /*if(((*base + index) & 0x3) || ((*base - index) & 0x3)){*/
-                if(tmp & 0x3){
+                if(((*base + index) & 0x3)){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1558,12 +1543,12 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
     {
         case 0x0:
         /* Normal store. Saved PC = current instruction + 12*/
-        mode_dst = (1<<4) | mode;
+        mode_dst = mode;
         break;
         
         case 0x1:
         /* Normal load. PC can branch, and ignores bits [1:0]*/
-        mode_dst = (1<<4) | mode;
+        mode_dst = mode;
         break;
                 
         case 0x2:
@@ -1579,7 +1564,7 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
             ASSERT(!"Writeback not allowed for STM with user mode!\n");
             return 0;
         }
-        mode_dst = (1<<4) | ARM_CPU_MODE_USR;
+        mode_dst = ARM_CPU_MODE_USR;
         break;
 
         case 0x3:
@@ -1592,7 +1577,7 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
                     return 0;
                 }
                 /* CPSR = SPSR */
-                mode_dst = (1<<4) | mode;
+                mode_dst = mode;
             }
             else { /* Without PC in the register list */
                 if(instr.lsm.W){
@@ -1600,7 +1585,7 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
                     ASSERT(!"Writeback not allowed for LDM with user mode!\n");
                     return 0;
                 }
-                mode_dst = (1<<4) | ARM_CPU_MODE_USR;
+                mode_dst = ARM_CPU_MODE_USR;
             }
         break;
     }
@@ -1638,7 +1623,10 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
     }
     
     if(instr.lsm.W && !GetException(cpu, ARM_Exception_Data_Abort)){
-        *cpu->reg[mode][Rn] += transfer_size * 4;
+        if(instr.lsm.U)
+            *cpu->reg[mode][Rn] += transfer_size * 4;
+        else
+            *cpu->reg[mode][Rn] -= transfer_size * 4;
     }
     else if(GetException(cpu, ARM_Exception_Data_Abort)){
         *cpu->reg[mode_dst][Rn] = base; /*restore */
@@ -1669,7 +1657,7 @@ static int handler_branch(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr
         value = instr.branch.immed24;
         if(value & (1<<23))
             value |= 0xFF000000; /* sign extend */
-        value << 2;
+        value <<= 2;
         if(instr.branch.L)
             *cpu->reg[mode][LR] = *cpu->reg[mode][PC] + 4;
         *cpu->reg[mode][PC] += value + 8;
