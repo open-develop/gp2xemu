@@ -14,13 +14,13 @@ Disassembly of section .data:
   1c:	e24ff008 	sub	pc, pc, #8	; 0x8
   20:	e92d4010 	stmdb	sp!, {r4, lr}
   24:	e24dd014 	sub	sp, sp, #20	; 0x14
-  28:	e59f3084 	ldr	r3, [pc, #132]	; 0xb4
+  28:	e3a03b4b 	mov	r3, #76800	; 0x12c00
   2c:	e58d3004 	str	r3, [sp, #4]
   30:	e3a03102 	mov	r3, #-2147483648	; 0x80000000
   34:	e58d3008 	str	r3, [sp, #8]
-  38:	e59f3078 	ldr	r3, [pc, #120]	; 0xb8
+  38:	e59f3070 	ldr	r3, [pc, #112]	; 0xb0
   3c:	e58d300c 	str	r3, [sp, #12]
-  40:	e59f3074 	ldr	r3, [pc, #116]	; 0xbc
+  40:	e59f306c 	ldr	r3, [pc, #108]	; 0xb4
   44:	e58d3010 	str	r3, [sp, #16]
   48:	e3a03000 	mov	r3, #0	; 0x0
   4c:	e58d3000 	str	r3, [sp]
@@ -31,33 +31,31 @@ Disassembly of section .data:
   60:	e59d3008 	ldr	r3, [sp, #8]
   64:	e0824003 	add	r4, r2, r3
   68:	e59d3000 	ldr	r3, [sp]
-  6c:	e2033020 	and	r3, r3, #32	; 0x20
+  6c:	e203301f 	and	r3, r3, #31	; 0x1f
   70:	e59d0010 	ldr	r0, [sp, #16]
   74:	e1a01003 	mov	r1, r3
-  78:	eb000010 	bl	0xc0
+  78:	eb00000e 	bl	0xb8
   7c:	e1a03000 	mov	r3, r0
   80:	e5843000 	str	r3, [r4]
   84:	e59d3000 	ldr	r3, [sp]
   88:	e2833001 	add	r3, r3, #1	; 0x1
   8c:	e58d3000 	str	r3, [sp]
-  90:	e59d3000 	ldr	r3, [sp]
-  94:	e59d2004 	ldr	r2, [sp, #4]
-  98:	e1a02122 	mov	r2, r2, lsr #2
-  9c:	e1530002 	cmp	r3, r2
-  a0:	3affffeb 	bcc	0x54
-  a4:	e59d200c 	ldr	r2, [sp, #12]
-  a8:	e3a03001 	mov	r3, #1	; 0x1
-  ac:	e5823000 	str	r3, [r2]
-  b0:	eaffffe4 	b	0x48
-  b4:	001c2000 	andeqs	r2, ip, r0
-  b8:	001c2004 	andeqs	r2, ip, r4
-  bc:	00ff00ff 	ldreqsh	r0, [pc, #15]	; 0xd3
-  c0:	e24dd008 	sub	sp, sp, #8	; 0x8
-  c4:	e58d0004 	str	r0, [sp, #4]
-  c8:	e58d1000 	str	r1, [sp]
-  cc:	e59d2004 	ldr	r2, [sp, #4]
-  d0:	e59d3000 	ldr	r3, [sp]
-  d4:	e1a03372 	mov	r3, r2, ror r3
-  d8:	e1a00003 	mov	r0, r3
-  dc:	e28dd008 	add	sp, sp, #8	; 0x8
-  e0:	e12fff1e 	bx	lr
+  90:	e59d2000 	ldr	r2, [sp]
+  94:	e59d3004 	ldr	r3, [sp, #4]
+  98:	e1520003 	cmp	r2, r3
+  9c:	3affffec 	bcc	0x54
+  a0:	e59d200c 	ldr	r2, [sp, #12]
+  a4:	e3a03001 	mov	r3, #1	; 0x1
+  a8:	e5823000 	str	r3, [r2]
+  ac:	eaffffe5 	b	0x48
+  b0:	8004b000 	andhi	fp, r4, r0
+  b4:	00ff00ff 	ldreqsh	r0, [pc, #15]	; 0xcb
+  b8:	e24dd008 	sub	sp, sp, #8	; 0x8
+  bc:	e58d0004 	str	r0, [sp, #4]
+  c0:	e58d1000 	str	r1, [sp]
+  c4:	e59d2004 	ldr	r2, [sp, #4]
+  c8:	e59d3000 	ldr	r3, [sp]
+  cc:	e1a03372 	mov	r3, r2, ror r3
+  d0:	e1a00003 	mov	r0, r3
+  d4:	e28dd008 	add	sp, sp, #8	; 0x8
+  d8:	e12fff1e 	bx	lr

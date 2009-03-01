@@ -30,11 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "memory.h"
 #include "../cpu/cpu.h"
 #include "../assert.h"
-/*
-#define VIDEOMEM_START  0x80000000
-#define VIDEOMEM_END  0x801C2000
-#define VIDEOMEM_UPDATE 0x1C2004
-*/
+
 
 int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len)
 {
@@ -145,6 +141,12 @@ uint8_t ReadMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
     return ((const uint8_t*)mem)[address];
 }
 
+/*
+#define VIDEOMEM_START  0x80000000
+#define VIDEOMEM_END  0x8004B000
+#define VIDEOMEM_UPDATE 0x8004B000
+*/
+
 void WriteMemory32(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint32_t value)
 {
     void* src = mem->mem;
@@ -157,6 +159,10 @@ void WriteMemory32(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint32_t val
     }
     else if(address == VIDEOMEM_UPDATE) {
         SDL_UpdateRect(mem->video, 0,0,0,0);
+        return;
+    }
+    else if(address > VIDEOMEM_UPDATE) {
+        RaiseException(cpu, ARM_Exception_Data_Abort);
         return;
     }
     
