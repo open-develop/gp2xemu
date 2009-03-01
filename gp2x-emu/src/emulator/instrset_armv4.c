@@ -34,12 +34,18 @@ OTHER DEALINGS IN THE SOFTWARE.
             Handle SPSR user and system mode with unpredictable flag instead of
             asserts.
 */
+#ifdef DEBUG
+#define DPRINT() do{printf("Entering function: %s.\n",__FUNCTION__);}while(0)
+#elif 
+#define DPRINT() 
+#endif
 
 static int handler_and(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -92,6 +98,7 @@ static int handler_eor(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -144,6 +151,7 @@ static int handler_sub(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -196,6 +204,7 @@ static int handler_rsb(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -248,6 +257,7 @@ static int handler_add(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -300,6 +310,7 @@ static int handler_adc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -352,6 +363,7 @@ static int handler_sbc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -405,6 +417,7 @@ static int handler_rsc(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -460,6 +473,7 @@ static int handler_tst(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -494,6 +508,7 @@ static int handler_teq(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -528,6 +543,7 @@ static int handler_cmp(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -562,6 +578,7 @@ static int handler_cmn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, RnVal, alu_out, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -596,6 +613,7 @@ static int handler_orr(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -648,6 +666,7 @@ static int handler_mov(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -696,6 +715,7 @@ static int handler_bic(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, RnVal, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -748,6 +768,7 @@ static int handler_mvn(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, *RdPtr, shifter_operand;
     int shifter_carry, mode, cycles;
 
+    DPRINT();
     cycles = 0; /* Important to set anyway, or else we get an infinite loop */
     if( !CheckConditionFlag(cpu, instr.dp_im.cond) )
         return 0; /* noop */
@@ -821,6 +842,7 @@ static int handler_mul(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, Rm, Rs, *RdPtr, RmVal, RsVal;
     int cycles, mode;
 
+    DPRINT();
     cycles = 0;
     
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
@@ -868,6 +890,7 @@ static int handler_mla(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rd, Rm, Rs, Rn, *RdPtr, RmVal, RsVal, RnVal;
     int cycles, mode;
 
+    DPRINT();
     cycles = 0;
 
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
@@ -918,6 +941,7 @@ static int handler_smull(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     int64_t result64;    
     int cycles, mode;
 
+    DPRINT();
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
         return 0;
 
@@ -970,6 +994,7 @@ static int handler_smlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint64_t accum64;
     int cycles, mode;
 
+    DPRINT();
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
         return 0;
 
@@ -1022,6 +1047,7 @@ static int handler_umull(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint64_t result64;    
     int cycles, mode;
 
+    DPRINT();
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
         return 0;
 
@@ -1073,6 +1099,7 @@ static int handler_umlal(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint64_t result64, accum64;
     int cycles, mode;
 
+    DPRINT();
     if( !CheckConditionFlag(cpu, instr.mul.cond) )
         return 0;
 
@@ -1132,6 +1159,7 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
 {
 
 
+    DPRINT();
     if(L){
         if(B)
             *Rd = ReadMemory8(cpu, mem, address);
@@ -1161,6 +1189,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
     
     uint32_t *dest, *base, index, Rd, Rn;
 
+    DPRINT();
     cycles = 0;    
     type = (instr.ls_io.P<<1)|instr.ls_io.W;
     cond = CheckConditionFlag(cpu, instr.ls_io.cond);
@@ -1252,7 +1281,16 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-                if(((*base + index + 8 ) & 0x3)){
+
+                uint32_t tmp = *base;
+
+                if(U)
+                    tmp += index;
+                else tmp -=index;
+
+                tmp += (8 * (Rn == PC)?1:0);
+
+                if(tmp & 0x3){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1284,7 +1322,14 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-                if(((*base + index) & 0x3)){
+
+                uint32_t tmp = *base;
+
+                if(U)
+                    tmp += index;
+                else tmp -=index;
+
+                if(tmp & 0x3){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1316,6 +1361,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
 static void loadstoreextra_accessmemory(ARM_CPU* cpu, ARM_Memory* mem, 
     uint32_t address, uint32_t* Rd, int L, int H, int S)
 {
+    DPRINT();
     if(L){
         if(H){ /* halfword */
             *Rd = ReadMemory16(cpu, mem, address);
@@ -1356,6 +1402,7 @@ static int handler_loadstoreextra(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instructi
     
     uint32_t *dest, *base, index, Rd, Rn;
 
+    DPRINT();
     cycles = 0;
     type = (instr.lsh_io.P<<1)|instr.lsh_io.W;
     cond = CheckConditionFlag(cpu, instr.lsh_io.cond);
@@ -1478,6 +1525,7 @@ static int handler_loadstoremultiple(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instru
     int mode, mode_dst, i;
     cycles = 0;
 
+    DPRINT();
     if(!CheckConditionFlag(cpu, instr.lsm.cond))
         return cycles;
 
@@ -1647,6 +1695,7 @@ static int handler_branch(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr
     uint32_t value, Rm;
     int mode, cycles;
     
+    DPRINT();
     cycles = 0;
     
     if(!CheckConditionFlag(cpu, instr.branch.cond))
@@ -1690,6 +1739,7 @@ static int handler_statusreg(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
     int cycles;
     int mode;
     
+    DPRINT();
     opcode = (instr.mrs.opcode1<<2) | instr.mrs.opcode0;
     
     if(!CheckConditionFlag(cpu, instr.branch.cond))
@@ -1805,6 +1855,7 @@ int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
     uint32_t Rn, Rd, Rm, *RdPtr, RnVal, RmVal;
     int B, mode, cycles;
     
+    DPRINT();
     cycles = 0;
     
     if(!CheckConditionFlag(cpu, instr.swap.cond))
@@ -1832,6 +1883,7 @@ int handler_swap(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 
 int handler_cputransfer(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction instr)
 {
+    DPRINT();
     return 0;
 }
 
