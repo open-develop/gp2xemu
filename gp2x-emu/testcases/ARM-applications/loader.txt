@@ -24,7 +24,7 @@ Disassembly of section .data:
   44:	e58d3010 	str	r3, [sp, #16]
   48:	e3a03000 	mov	r3, #0	; 0x0
   4c:	e58d3000 	str	r3, [sp]
-  50:	ea00000e 	b	0x90
+  50:	ea000011 	b	0x9c
   54:	e59d3000 	ldr	r3, [sp]
   58:	e1a03103 	mov	r3, r3, lsl #2
   5c:	e1a02003 	mov	r2, r3
@@ -37,16 +37,16 @@ Disassembly of section .data:
   78:	eb00000e 	bl	0xb8
   7c:	e1a03000 	mov	r3, r0
   80:	e5843000 	str	r3, [r4]
-  84:	e59d3000 	ldr	r3, [sp]
-  88:	e2833001 	add	r3, r3, #1	; 0x1
-  8c:	e58d3000 	str	r3, [sp]
-  90:	e59d2000 	ldr	r2, [sp]
-  94:	e59d3004 	ldr	r3, [sp, #4]
-  98:	e1520003 	cmp	r2, r3
-  9c:	3affffec 	bcc	0x54
-  a0:	e59d200c 	ldr	r2, [sp, #12]
-  a4:	e3a03001 	mov	r3, #1	; 0x1
-  a8:	e5823000 	str	r3, [r2]
+  84:	e59d200c 	ldr	r2, [sp, #12]
+  88:	e3a03001 	mov	r3, #1	; 0x1
+  8c:	e5823000 	str	r3, [r2]
+  90:	e59d3000 	ldr	r3, [sp]
+  94:	e2833001 	add	r3, r3, #1	; 0x1
+  98:	e58d3000 	str	r3, [sp]
+  9c:	e59d2000 	ldr	r2, [sp]
+  a0:	e59d3004 	ldr	r3, [sp, #4]
+  a4:	e1520003 	cmp	r2, r3
+  a8:	3affffe9 	bcc	0x54
   ac:	eaffffe5 	b	0x48
   b0:	8004b000 	andhi	fp, r4, r0
   b4:	00ff00ff 	ldreqsh	r0, [pc, #15]	; 0xcb

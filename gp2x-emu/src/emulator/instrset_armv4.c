@@ -1142,7 +1142,7 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
         if(B)
             WriteMemory8(cpu, mem, address, *Rd);
         else{
-            if(index = PC)
+            if(index == PC)
                 WriteMemory32(cpu, mem, address, *Rd + 12);
             else
                 WriteMemory32(cpu, mem, address, *Rd);
