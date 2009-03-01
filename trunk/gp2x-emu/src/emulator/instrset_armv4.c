@@ -1288,7 +1288,7 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     tmp += index;
                 else tmp -=index;
 
-                tmp += (8 * (Rn == PC)?1:0);
+                tmp += (Rn == PC)?8:0;
 
                 if(tmp & 0x3){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
