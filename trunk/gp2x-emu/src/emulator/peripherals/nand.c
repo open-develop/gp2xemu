@@ -48,11 +48,16 @@ int InitNAND(ARM_NAND* nand, const char* filepath)
 int OnInitNAND(ARM_NAND* nand, uint32_t* instr_boot)
 {
     int wordsread;
+    long len;
+    
     if(!nand || !instr_boot){
         ASSERT(!"nand or instr_boot pointers are NULL");
         return -1;
     }
-    wordsread = fread(instr_boot, sizeof(uint32_t), NAND_BOOT_LOAD_SIZE, nand->file);
+    fseek(nand->file, 0, SEEK_END);
+    len = ftell(nand->file);
+    rewind(nand->file);
+    wordsread = fread(instr_boot, sizeof(uint32_t), len / 4, nand->file);
 #if 0    
     if(wordsread != NAND_BOOT_LOAD_SIZE){
         ASSERT(!"Couldn't read the whole bootloader");

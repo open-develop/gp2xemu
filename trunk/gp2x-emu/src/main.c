@@ -27,7 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
+#include "emulator/assert.h"
 #include "emulator/disasm_arm.h"
 #include "emulator/cpu/cpu.h"
 #include "emulator/instrset_armv4.h"
@@ -45,6 +45,8 @@ int main(int argc, const char* argv[])
     uint16_t instr_thumb;
     int type;
     char cmd[10];
+    SDL_Event e;
+    int quit;
     
     if(argc != 2){
         printf("Usage: %s <foo.rom>\n", argv[0]);
@@ -54,13 +56,16 @@ int main(int argc, const char* argv[])
     memset(cmd, '\0', sizeof(char) * 10);
     ResetCPU(&cpu);
     InitNAND(&nand, argv[1]);
-    InitMemory(&nand, &mem, 0x10000);
+    InitMemory(&nand, &mem, 0x02000000);
+    DestroyNAND(&nand);
+    quit = 0;
     
-    printf("-All good so far.. starting.\n");
-
-    while(1)
+    /* stack cheat bail on E4*/
+    *cpu.reg[3][SP] = 0x01FFFFFC;
+    
+    while(!quit)
     {
-#if 1
+#if 0
         scanf("%s", cmd);
         if(strcmp(cmd, "next") && strcmp(cmd, "n"))
             break;
@@ -70,9 +75,12 @@ int main(int argc, const char* argv[])
             pc = GetProgramCounter(&cpu);
             instr_arm = ReadInstruction32(&cpu, &mem);
             type = ARMV4_ParseInstruction((ARM_Word)instr_arm);
+//            PrintInstruction(&cpu, type, *pc);
             cpu.cpubusywait  = ARMV4_ExecuteInstruction(&cpu, &mem, (ARMV4_Instruction)instr_arm, type);
+            if(cpu.exception) /* test */
+                break;
             exp = HandleException(&cpu); /*undefined, interrupt, SWI, data abort, etc */
-            PrintInstruction(&cpu, type, *pc);
+
             if(exp == ARM_Exception_Unpredictable){
                 printf("Unpredictable behaviour at address %u!\n",*pc);
                 break;
@@ -84,14 +92,26 @@ int main(int argc, const char* argv[])
         }
         else
             --cpu.cpubusywait;
+        while(SDL_PollEvent(&e)){
+            if(e.type == SDL_QUIT)
+                quit = 1;
+            if(e.type == SDL_KEYDOWN)
+                quit = 1;
+        }
+        
+        if(*pc & 0x3)
+            break;
+        
     }
+    DestroyMemory(&mem);
     return 0;
 }
 
 void PrintInstruction(ARM_CPU* cpu, int type, uint32_t address)
 {
     int i,j, regid, mode;
-    printf("%X ",address);
+    printf("Address: %X\n",address);
+    
     switch(type)
     {
         case ARMV4_TypeUndefined:
@@ -153,6 +173,7 @@ void PrintInstruction(ARM_CPU* cpu, int type, uint32_t address)
         }
         printf("\n");
     }
+    
     return;
 }
 

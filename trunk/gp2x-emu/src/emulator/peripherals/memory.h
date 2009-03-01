@@ -28,6 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define MEMORY_H_INCLUDED
 /* need uint32_t */
 #include <stdint.h>
+/* for testing purposes */
+#include <SDL/SDL.h>
 #include "../cpu/cpu.h"
 #include "nand.h"
 
@@ -36,13 +38,18 @@ OTHER DEALINGS IN THE SOFTWARE.
  * No support for access regions, memory translation, cache and write buffers for now
  */
 
- #define ARM_MEMORY_SIZE 0x10000
+#define ARM_MEMORY_SIZE 0x02000000 /* 32 MiB */
+/* just for testing */
+#define VIDEOMEM_START  0x80000000
+#define VIDEOMEM_END  0x801C2000
+#define VIDEOMEM_UPDATE 0x1C2004
 
 /* TODO: Add an indirection here, so we can map hardware registers */
 typedef struct ARM_Memory
 {
     uint8_t *mem;
     unsigned int length;
+    SDL_Surface* video;
 } ARM_Memory;
 
 /* len must be a multiple of four */

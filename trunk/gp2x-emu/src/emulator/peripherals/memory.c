@@ -30,11 +30,17 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "memory.h"
 #include "../cpu/cpu.h"
 #include "../assert.h"
+/*
+#define VIDEOMEM_START  0x80000000
+#define VIDEOMEM_END  0x801C2000
+#define VIDEOMEM_UPDATE 0x1C2004
+*/
 
 int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len)
 {
-    if(!mem || len < NAND_BOOT_LOAD_SIZE*4){
-        ASSERT(!"mem pointer is zero, or len is of illegal size");
+    /* if(!mem || len < NAND_BOOT_LOAD_SIZE*4){ */
+    if(!mem){
+        ASSERT(!"mem pointer is zero");
         return -1;
     }
     /* align to four */
@@ -46,8 +52,10 @@ int InitMemory(ARM_NAND* nand, ARM_Memory* mem, unsigned int len)
         ASSERT(!"Allocation failure.");
         return -1;
     }
-
+    SDL_Init(SDL_INIT_VIDEO);
+    mem->video = SDL_SetVideoMode(320, 240, 32, SDL_SWSURFACE);
     OnInitNAND(nand, (uint32_t*)mem->mem);
+    
     return len*4;
 }
 
@@ -59,6 +67,7 @@ void DestroyMemory(ARM_Memory* mem)
         free(mem->mem);
         mem->mem = NULL;
     }
+    SDL_Quit();
     return;
 }
 
@@ -102,7 +111,12 @@ uint16_t ReadInstruction16(ARM_CPU* cpu, const ARM_Memory* mem)
 uint32_t ReadMemory32(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
 {
     const void* src = mem->mem;
+    const uint32_t* vidmem = (uint32_t*)mem->video->pixels;
     address &= ~0x3;
+    if(address >= VIDEOMEM_START && address < VIDEOMEM_END){
+        return vidmem[(address - VIDEOMEM_START) / 4UL];
+    }
+    
     if(address >= mem->length){
         RaiseException(cpu, ARM_Exception_Data_Abort);
         return -1;
@@ -133,15 +147,47 @@ uint8_t ReadMemory8(ARM_CPU* cpu, const ARM_Memory* mem, uint32_t address)
 
 void WriteMemory32(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint32_t value)
 {
-
+    void* src = mem->mem;
+    uint32_t* vidmem = (uint32_t*)mem->video->pixels;
+    address &= ~0x3;
+    
+    if(address >= VIDEOMEM_START && address < VIDEOMEM_END){
+        vidmem[(address - VIDEOMEM_START) / 4UL] = value;
+        return;
+    }
+    else if(address == VIDEOMEM_UPDATE) {
+        SDL_UpdateRect(mem->video, 0,0,0,0);
+        return;
+    }
+    
+    if(address >= mem->length){
+        RaiseException(cpu, ARM_Exception_Data_Abort);
+        return;
+    }
+    ((uint32_t*)src)[address>>2] = value;
+    return;
 }
 
 void WriteMemory16(ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint16_t value)
 {
-
+    void* src = mem->mem;
+    address &= ~0x1;
+    if(address >= mem->length){
+        RaiseException(cpu, ARM_Exception_Data_Abort);
+        return;
+    }
+    ((uint16_t*)src)[address>>1] = value;
+    return;
 }
 
 void WriteMemory8 (ARM_CPU* cpu, ARM_Memory* mem, uint32_t address, uint8_t value)
 {
-
+    void* src = mem->mem;
+    if(address >= mem->length){
+        RaiseException(cpu, ARM_Exception_Data_Abort);
+        return;
+    }
+    ((uint8_t*)src)[address] = value;
+    return;
 }
+

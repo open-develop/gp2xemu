@@ -65,9 +65,8 @@ static int ARMV4_ParseInstrExt1(ARM_Word instr)
         case 0x1:
         /* BX or (undefined) CLZ */
             if(op == 0x1){
-                /* Don't implement BX yet
-                return ARMV4_TypeBranch;  */
-                return ARMV4_TypeUndefined;
+                /* BX */
+                return ARMV4_TypeBranch; 
             }
             else{
                 return ARMV4_TypeUndefined;
