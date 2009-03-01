@@ -36,7 +36,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 #ifdef DEBUG
 #define DPRINT() do{printf("Entering function: %s.\n",__FUNCTION__);}while(0)
-#elif 
+#else
 #define DPRINT() 
 #endif
 
