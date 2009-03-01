@@ -1142,6 +1142,7 @@ static void loadstore_accessmemory(ARM_CPU* cpu, ARM_Memory* mem,
         if(B)
             WriteMemory8(cpu, mem, address, *Rd);
         else{
+
             uint32_t tmp = address + 12 * (index == PC?1:0);
             WriteMemory32(cpu, mem, tmp, *Rd);
         }
@@ -1250,7 +1251,15 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-                if(((*base + index + 8 ) & 0x3)){
+
+                uint32_t tmp = *base;
+
+                if(U)
+                    tmp += index;
+                else tmp -= index;
+                tmp += (8 * (Rn == PC)?1:0);
+
+                if(tmp & 0x3){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
@@ -1282,7 +1291,15 @@ static int handler_loadstore(ARM_CPU* cpu, ARM_Memory* mem, ARMV4_Instruction in
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
                 }
-                if(((*base + index) & 0x3)){
+
+                uint32_t tmp = *base;
+
+                if(U)
+                    tmp += index;
+                else tmp -= index;
+
+                /*if(((*base + index) & 0x3) || ((*base - index) & 0x3)){*/
+                if(tmp & 0x3){
                     ASSERT(!"addr[1:0] != 0 and Rd == PC unpredictable");
                     RaiseException(cpu,ARM_Exception_Unpredictable);
                     return 0;
