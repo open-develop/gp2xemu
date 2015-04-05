@@ -1,0 +1,3 @@
+System-wide emulation of the MagicEyes MMSP2 chip and additional peripherals found on the GP2X F-100 handheld. Other emulators like QEMU and SkyEye can emulate the same architecture, but does not emulate the exact hardware found on this handheld. This project aims to do that.
+The goal is to make an accurate emulator which can aid in debugging and development. Ease-of-use and accuracy will have priority over performance.
+The GP2X supports DRM in order to protect commercial games/applications. DRM support is not planned due to legal issues.
